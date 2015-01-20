@@ -1,0 +1,19 @@
+<!doctype html>
+<title>Hello from Flask</title>
+
+{% if files %}
+    {% for file in files %}
+        {{ file }}<br>
+    {% endfor %}
+{% else %}
+    <h1>You have nothing in this path!!</h1>
+{% endif %}
+
+
+<form name="search_test" method="POST" action="/search">
+
+    Enter a path name to search:
+    <input type="text" name="path"/>
+    <input type="submit" value="Submit"/>
+
+</form>
