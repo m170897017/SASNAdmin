@@ -20,4 +20,5 @@ Here is what it's like.
 2. We start server with admin.  
 
 
-1111
+[How to start]  
+Run Runserver.py to start.  
