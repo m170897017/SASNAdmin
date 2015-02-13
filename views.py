@@ -6,15 +6,9 @@ Created on Nov 20, 2014
 @author: eccglln
 '''
 
-from RunServer import app
+if __name__ == '__main__':
 
 
-
-# 
-# 
-# class Views(object):
-#     
-#     def __init__(self, app):
-#         
-
-
+    from debug import test
+    a = test()
+    a.func()

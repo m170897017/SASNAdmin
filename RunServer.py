@@ -5,12 +5,16 @@ Created on Nov 20, 2014
 
 @author: eccglln
 '''
-import os
 from flask import Flask, render_template, request
 
-from views import *
+
+from CMDHelper import SASNCMDHelper
+
 
 app = Flask(__name__)
+
+sasn_cmd_helper = SASNCMDHelper()
+sasn_cmd_helper.init_ssh_for_test()
 
 @app.route('/')
 def index():
@@ -20,15 +24,9 @@ def index():
 def search():
     if request.method == 'POST':
         
-        files = search_path(request.form['path'])
+        results = sasn_cmd_helper.exec_cmd_test(request.form['cmd'])
         
-        return render_template('home.html', files=files)
-    
-    
-
-def search_path(path):
-    
-    return os.walk(path).next()[2]
+        return render_template('home.html', results=results)
 
 if __name__ == '__main__':
      
