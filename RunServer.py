@@ -7,16 +7,11 @@ Created on Nov 20, 2014
 '''
 from flask import Flask, render_template, request, redirect, url_for
 
-
 from CMDHelper import SASNCMDHelper
 import settings
 
 
 app = Flask(__name__)
-
-sasn_cmd_helper = SASNCMDHelper()
-sasn_cmd_helper.init_ssh_for_test()
-
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
@@ -34,6 +29,9 @@ def login():
         if request.form['username'] != settings.RP_USERNAME or request.form['password'] != settings.RP_PASSWORD:
             error = 'Invalid credential'
         else:
+            global sasn_cmd_helper
+            sasn_cmd_helper = SASNCMDHelper()
+            sasn_cmd_helper.init_ssh_for_test()
             return redirect(url_for('search'))
 
     return render_template('login.html', error=error)
