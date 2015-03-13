@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<title>Login SASN Admin </title>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+</body>
+</html>
+{% if error %}
+  <p class=error>Error: {{ error }}
+ {% endif %}
+
+<form name="login_test" method="post" action="">
+    <dl>
+        <dt>Username:
+        <dd><input type="text" name="username">
+        <dt>Passowrd:
+        <dd><input type="text" name="password">
+    </dl>
+    <p><input type="submit" value="Login">
+</form>

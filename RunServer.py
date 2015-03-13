@@ -5,10 +5,11 @@ Created on Nov 20, 2014
 
 @author: eccglln
 '''
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 
 
 from CMDHelper import SASNCMDHelper
+import settings
 
 
 app = Flask(__name__)
@@ -16,17 +17,26 @@ app = Flask(__name__)
 sasn_cmd_helper = SASNCMDHelper()
 sasn_cmd_helper.init_ssh_for_test()
 
-@app.route('/')
-def index():
-    return render_template('home.html')
 
-@app.route('/search', methods=[u'POST'])
+@app.route('/search', methods=['GET', 'POST'])
 def search():
     if request.method == 'POST':
         
         results = sasn_cmd_helper.exec_cmd_test(request.form['cmd'])
         
         return render_template('home.html', results=results)
+    return render_template('home.html')
+
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        if request.form['username'] != settings.RP_USERNAME or request.form['password'] != settings.RP_PASSWORD:
+            error = 'Invalid credential'
+        else:
+            return redirect(url_for('search'))
+
+    return render_template('login.html', error=error)
 
 if __name__ == '__main__':
      
