@@ -1,17 +1,11 @@
-<!DOCTYPE html>
-<title>Login SASN Admin </title>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+{% extends "home.html" %}
+{% block title %}SASN admin login{% endblock %}
 
-</body>
-</html>
+{% block content %}
 {% if error %}
   <p class=error>Error: {{ error }}
  {% endif %}
+
 
 <form name="login_test" method="post" action="">
     <dl>
@@ -22,3 +16,5 @@
     </dl>
     <p><input type="submit" value="Login">
 </form>
+{% endblock %}
+

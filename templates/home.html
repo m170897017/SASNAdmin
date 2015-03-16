@@ -1,19 +1,29 @@
 <!doctype html>
-<title>Hello from Flask</title>
 
-{% if results %}
-    {% for res in results %}
-        {{ res }}<br>
-    {% endfor %}
-{% else %}
-    <h1>You have nothing in output!!</h1>
-{% endif %}
+<html lang="en">
+<head>
+    {% block head %}
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+    <title>{% block title %} Hello from Flask {% endblock %}</title>
+    {% endblock %}
+</head>
+
+<body>
+<div id=""header>{% block header %}
+    <img src="/static/sasnadmin.png" />
+     {% endblock %}
+</div>
+ <div id="content">{% block content %}
+    <div id="left">{% block left %}
+        <div id="search"><a href="/templates/search.html">Search</a></div>
+        <div id="loadandapply"><a href="/templates/loadandapply.html">Load&Apply</a></div>
+  {% endblock %}</div>
 
 
-<form name="search_test" method="POST" action="/search">
-
-    Enter a command to execute:
-    <input type="text" name="cmd"/>
-    <input type="submit" value="Submit"/>
-
-</form>
+ {% endblock %}</div>
+    <div id="footer">
+        {% block footer %}
+        Copyright 2008 by Ericsson.
+        {% endblock %}
+    </div>
+</body>
