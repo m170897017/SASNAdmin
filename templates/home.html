@@ -9,21 +9,30 @@
 </head>
 
 <body>
-<div id=""header>{% block header %}
-    <img src="/static/sasnadmin.png" />
+<div id="header">{% block header %}
+
+
+    <a href="/home"><img src="/static/sasnadmin.png"/></a>
      {% endblock %}
 </div>
- <div id="content">{% block content %}
-    <div id="left">{% block left %}
-        <div id="search"><a href="/search">Search</a></div>
-        <div id="loadandapply"><a href="/loadandapply">Load&Apply</a></div>
+<div class="wrapper"> {% block wrapper %}
+  <!--the left navigation bar-->
+    <div class="left">{% block left %}
+        <ul>
+        <li><a href="/search"><span>Search</span></a></li>
+        <li><a href="/loadandapply"><span>Load&Apply</span></a></li>
+        <li><a href="/show"><span>Show Statistics</span></a></li>
+        </ul>
+
   {% endblock %}</div>
 
-
- {% endblock %}</div>
+ <div class="right">{% block content %}
+    {% endblock %}</div>
     <div id="footer">
         {% block footer %}
-        Copyright 2008 by Ericsson.
+            <p>Copyright 2015 by Ericsson. Authors:Stephen Lin, Guoyan Zhang, Congcong Gu, Rainbow Sun</p>
+
         {% endblock %}
     </div>
+ {% endblock %}</div>
 </body>

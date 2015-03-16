@@ -1,66 +1,115 @@
 
-input{
-    margin-top: auto;
-    background-color: aliceblue;
-    font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
-}
-h1{
-    text-align: center;
-    font-family: Consolas;
-    color: chocolate;
-    font-size: 2em;
 
+
+div {
+	border-radius: 5px;
 }
-img{
-    border-radius: 20%;
-    height: 100px;
+ul{
+    width: 15%;
+}
+li {
+	list-style-type: square;
     width: 200px;
-    margin: 0px 550px 100px 550px;
+}
+a{
+    width:200px;
+}
+div a{
+    height: 100px;
+	width: 400px;
+}
+img {
+	height: 100px;
+	width: 400px;
+
+
 
 }
 
-dt{
-    font-size:20px;
-    font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
-
+a:hover {
+	font-weight: bold;
 }
 
-#content{
-	height: 50px;
-	width: 100px;
-	border: 2px solid black;
-	border-radius: 5px;
-	/*Add your CSS here!*/
-	display:block;
-
+#footer {
+	position: relative;
+	height: 10%;
+	background-color: #668284;
+	clear: both;
+	font-family: Verdana, sans-serif;
+	font-size: 14px;
+	text-align: center;
+	color: #ffffff;
 }
 
+#footer p {
+	position: relative;
+	padding-top: 15px;
 }
 
-#footer{
-    clear:both
-	height: 50px;
-	width: 100px;
-	border: 2px solid black;
-	border-radius: 5px;
-	/*Add your CSS here!*/
-	display:block;
+#header p {
+	position: relative;
+	padding-top: 15px;
 
 }
-#header{
-	height: 50px;
-	width: 100px;
-	border: 2px solid black;
-	border-radius: 5px;
-	/*Add your CSS here!*/
-	display:block;
+#header {
+	z-index: 1;
+    position: relative;
+	height: 20%;
+	clear: both;
+	font-family: Verdana, sans-serif;
+	font-size: 14px;
+	text-align: center;
+    display: block;
 
 }
+.wrapper {width: 100%;height: 100%; }
+.left {
+	height: 700px;
+	background-color: #B9D7D9;
+	margin-bottom: 10px;
+    width:200px;
+    position:absolute;
+    left:0 ;
+    z-index:1
+
+}
+.right {
+
+	margin-top: 50px;
+	background-color: #F4EBC3;
+	margin-bottom: 10px;
+    height: 700px;
+    margin-left:200px;
+}
+
+
+
 #search{
     display: block;
     background-color: cornflowerblue;
+    border: 2px solid black;
+    padding:20px;
+    height: 50px;
+	width: 200px;
 }
 #loadandapply{
-        display: block;
+    display: block;
     background-color: cornflowerblue;
+    border: 2px solid black;
+    padding:20px;
+    height: 50px;
+	width: 200px;
+}
+#show{
+    display: block;
+    border: 2px solid black;
+    background-color: cornflowerblue;
+    padding:20px;
+    height: 50px;
+	width: 200px;
+}
+
+#output{
+    border:1px solid black;
+    background-color: aliceblue;
 }

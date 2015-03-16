@@ -13,7 +13,7 @@ import settings
 
 app = Flask(__name__)
 
-@app.route('/search', methods=['GET', 'POST'])
+@app.route('/search/', methods=['GET', 'POST'])
 def search():
     if request.method == 'POST':
         
@@ -22,7 +22,7 @@ def search():
         return render_template('search.html', results=results)
     return render_template('search.html')
 
-@app.route('/home')
+@app.route('/home/')
 def home():
     return render_template('home.html')
 
@@ -39,6 +39,16 @@ def login():
             return redirect(url_for('home'))
 
     return render_template('login.html', error=error)
+
+
+@app.route('/loadandapply/', methods=['GET', 'POST'])
+def load():
+    if request.method == 'POST':
+
+        results = sasn_cmd_helper.exec_cmd_test(request.form['cmd'])
+
+        return render_template('loadandapply.html', results=results)
+    return render_template('loadandapply.html')
 
 if __name__ == '__main__':
      
