@@ -1,0 +1,66 @@
+
+input{
+    margin-top: auto;
+    background-color: aliceblue;
+    font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
+}
+h1{
+    text-align: center;
+    font-family: Consolas;
+    color: chocolate;
+    font-size: 2em;
+
+}
+img{
+    border-radius: 20%;
+    height: 100px;
+    width: 200px;
+    margin: 0px 550px 100px 550px;
+
+}
+
+dt{
+    font-size:20px;
+    font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
+
+}
+
+#content{
+	height: 50px;
+	width: 100px;
+	border: 2px solid black;
+	border-radius: 5px;
+	/*Add your CSS here!*/
+	display:block;
+
+}
+
+}
+
+#footer{
+    clear:both
+	height: 50px;
+	width: 100px;
+	border: 2px solid black;
+	border-radius: 5px;
+	/*Add your CSS here!*/
+	display:block;
+
+}
+#header{
+	height: 50px;
+	width: 100px;
+	border: 2px solid black;
+	border-radius: 5px;
+	/*Add your CSS here!*/
+	display:block;
+
+}
+#search{
+    display: block;
+    background-color: cornflowerblue;
+}
+#loadandapply{
+        display: block;
+    background-color: cornflowerblue;
+}

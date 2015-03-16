@@ -1,0 +1,25 @@
+{% extends "home.html" %}
+{% block title %}SASN admin search{% endblock %}
+
+{% block content %}
+{% if error %}
+  <p class=error>Error: {{ error }}
+ {% endif %}
+<body>
+{% if results %}
+    {% for res in results %}
+        {{ res }}<br>
+    {% endfor %}
+{% else %}
+    <h1>You have nothing in output!!</h1>
+{% endif %}
+
+
+<form name="search_test" method="POST" action="/search">
+
+    Enter a command to execute:
+    <input type="text" name="cmd"/>
+    <input type="submit" value="Submit"/>
+
+</form>
+{% endblock %}

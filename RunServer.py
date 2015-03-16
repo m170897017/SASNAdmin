@@ -19,7 +19,7 @@ def search():
         
         results = sasn_cmd_helper.exec_cmd_test(request.form['cmd'])
         
-        return render_template('home.html', results=results)
+        return render_template('search.html', results=results)
     return render_template('home.html')
 
 @app.route('/', methods=['GET', 'POST'])
