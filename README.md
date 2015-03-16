@@ -2,7 +2,8 @@
 SASNAdmin is a project written to provide a GUI for SASN.
 
 Here is what it's like.
-![alt tag](https://cloud.githubusercontent.com/assets/2274145/6183013/19649c76-b38a-11e4-85be-0994288abe8e.jpg)
+![alt tag](https://cloud.githubusercontent.com/assets/2274145/6663394/3c168f9c-cc01-11e4-9bf6-fae1bb4d64a8.jpg)
+
 
 [TODO]  
 1. UI. Write a beautiful UI for it.  
