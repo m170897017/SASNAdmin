@@ -20,6 +20,10 @@ def search():
         results = sasn_cmd_helper.exec_cmd_test(request.form['cmd'])
         
         return render_template('search.html', results=results)
+    return render_template('search.html')
+
+@app.route('/home')
+def home():
     return render_template('home.html')
 
 @app.route('/', methods=['GET', 'POST'])
@@ -32,7 +36,7 @@ def login():
             global sasn_cmd_helper
             sasn_cmd_helper = SASNCMDHelper()
             sasn_cmd_helper.init_ssh_for_test()
-            return redirect(url_for('search'))
+            return redirect(url_for('home'))
 
     return render_template('login.html', error=error)
 
