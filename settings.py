@@ -14,3 +14,8 @@ RP_NSSH = '/opt/disk/service-pools/sasnpool/active/bin/nssh -c'
 HOST_IP = '10.65.100.22'
 HOST_USERNAME = 'root'
 HOST_PASSWORD = 'rootroot'
+
+UPLOAD_FOLDER = 'C:\\temp\\kkpro\\'
+ALLOWED_EXTENSIONS = set(['wzd', 'cfg', 'conf'])
+MAX_CONTENT_LENGTH = 160 * 1024 * 1024
+
