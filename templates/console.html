@@ -1,9 +1,9 @@
 {% extends "home.html" %}
-{% block title %}SASN admin search{% endblock %}
+{% block title %}SASN admin console output{% endblock %}
 
 {% block content %}
 
-<form name="search_test" method="POST" action="/search/">
+<form name="console_output" method="POST" action="/my_console/">
 
     Enter a command to execute:
     <input type="text" name="cmd"/>
@@ -11,9 +11,7 @@
 
 </form>
     <div id="output">
-{% if error %}
-  <p class=error>Error: {{ error }}
- {% endif %}
+
 <body>
 {% if results %}
     {% for res in results %}
@@ -23,4 +21,6 @@
     <h1>You have nothing in output!!</h1>
 {% endif %}
     </div>
+</body>
 {% endblock %}
+

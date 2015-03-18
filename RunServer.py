@@ -6,39 +6,33 @@ Created on Nov 20, 2014
 @author: eccglln
 '''
 import os
+
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
-
 from werkzeug import secure_filename
-
-from werkzeug import SharedDataMiddleware
 
 from CMDHelper import SASNCMDHelper
 import settings
 
-UPLOAD_FOLDER = 'C:\Users\eggnzzg\SASNAdmin\static'
-ALLOWED_EXTENSIONS = set(['wzd', 'cfg', 'conf'])
-
 app = Flask(__name__)
 
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['UPLOAD_FOLDER'] = settings.UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = settings.MAX_CONTENT_LENGTH
 
 
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+           filename.rsplit('.', 1)[1] in settings.ALLOWED_EXTENSIONS
 
 
 
-@app.route('/search/', methods=['GET', 'POST'])
+@app.route('/my_console/', methods=['GET', 'POST'])
 def search():
     if request.method == 'POST':
         
         results = sasn_cmd_helper.exec_cmd_test(request.form['cmd'])
         
-        return render_template('search.html', results=results)
-    return render_template('search.html')
+        return render_template('console.html', results=results)
+    return render_template('console.html')
 
 @app.route('/home/')
 def home():
