@@ -1,6 +1,11 @@
 {% extends "home.html" %}
 {% block title %}SASN admin console output{% endblock %}
 
+{% block head %}
+{{ super() }}
+<script type="text/javascript" src="/static/scrollToBottom.js"></script>
+{% endblock %}
+
 {% block content %}
 
 <form name="console_output" method="POST" action="/my_console/">
@@ -10,17 +15,19 @@
     <input type="submit" value="Submit"/>
 
 </form>
-    <div id="output">
 
-<body>
-{% if results %}
+<div id="output" style="overflow-y:auto; height:400px;" >
+
+    <body>
+    {% if results %}
     {% for res in results %}
-        {{ res }}<br>
+    {{ res }}<br>
     {% endfor %}
-{% else %}
+    {% else %}
     <h1>You have nothing in output!!</h1>
-{% endif %}
-    </div>
+    {% endif %}
+</div>
 </body>
+
 {% endblock %}
 
