@@ -17,7 +17,8 @@ app = Flask(__name__)
 
 app.config['UPLOAD_FOLDER'] = settings.UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = settings.MAX_CONTENT_LENGTH
-
+console_output = []
+command_number = 0
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -27,12 +28,17 @@ def allowed_file(filename):
 
 @app.route('/my_console/', methods=['GET', 'POST'])
 def search():
+    global command_number
     if request.method == 'POST':
-        
-        results = sasn_cmd_helper.exec_cmd_test(request.form['cmd'])
-        
-        return render_template('console.html', results=results)
-    return render_template('console.html')
+
+        console_output.append('-'*40+'\n')
+        console_output.append('In[%d]: ' % command_number + request.form['cmd'])
+        console_output.append('Out[%d]: \n' % command_number)
+        console_output.extend(sasn_cmd_helper.exec_cmd_test(request.form['cmd']))
+        command_number += 1
+        return render_template('console.html', results=console_output)
+    else:
+        return render_template('console.html')
 
 @app.route('/home/')
 def home():
@@ -45,9 +51,15 @@ def login():
         if request.form['username'] != settings.RP_USERNAME or request.form['password'] != settings.RP_PASSWORD:
             error = 'Invalid credential'
         else:
+
+            # create a ssh connection to RP card
             global sasn_cmd_helper
             sasn_cmd_helper = SASNCMDHelper()
             sasn_cmd_helper.init_ssh_for_test()
+
+            # clear console output everytime a user is created
+            console_output[:] = []
+            command_number = 0
             return redirect(url_for('home'))
 
     return render_template('login.html', error=error)

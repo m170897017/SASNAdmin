@@ -13,26 +13,29 @@
 
 
     <a href="/home"><img src="/static/sasnadmin.png"/></a>
-     {% endblock %}
+    {% endblock %}
 </div>
 <div class="wrapper"> {% block wrapper %}
-  <!--the left navigation bar-->
+    <!--the left navigation bar-->
     <div class="left">{% block left %}
         <ul>
-        <li><a href="/my_console"><span>Console Output</span></a></li>
-        <li><a href="/loadandapply"><span>Load&Apply</span></a></li>
-        <li><a href="/show"><span>Log out</span></a></li>
+            <li><a href="/my_console"><span>Console Output</span></a></li>
+            <li><a href="/loadandapply"><span>Load&Apply</span></a></li>
+            <li><a href="/show"><span>Log out</span></a></li>
         </ul>
-
-  {% endblock %}</div>
-
- <div class="right">{% block content %}
-    {% endblock %}</div>
-    <div id="footer">
-        {% block footer %}
-            <p>Copyright 2015 by Ericsson. Authors:Stephen Lin, Guoyan Zhang, Congcong Gu, Rainbow Sun</p>
 
         {% endblock %}
     </div>
- {% endblock %}</div>
+
+    <div class="right">{% block content %}
+        {% endblock %}
+    </div>
+    <div id="footer">
+        {% block footer %}
+        <p>Copyright 2015 by Ericsson. Authors:Stephen Lin, Guoyan Zhang, Congcong Gu, Rainbow Sun</p>
+
+        {% endblock %}
+    </div>
+    {% endblock %}
+</div>
 </body>

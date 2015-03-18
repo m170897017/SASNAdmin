@@ -112,6 +112,7 @@ a:hover {
 #output{
     border:1px solid black;
     background-color: aliceblue;
+
 }
 .error{
     font-family: 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
