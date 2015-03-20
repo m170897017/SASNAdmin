@@ -3,11 +3,15 @@
 
 {% block head %}
 {{ super() }}
-<script type="text/javascript" src="/static/scrollToBottom.js"></script>
+    <script type="text/javascript">
+    $(function(){
+    $("#output").scrollTop($("#output")[0].scrollHeight);
+    });
+    </script>
 {% endblock %}
 
-{% block content %}
 
+{% block content %}
 <form name="console_output" method="POST" action="/my_console/">
 
     Enter a command to execute:
@@ -15,10 +19,9 @@
     <input type="submit" value="Submit"/>
 
 </form>
+<div id="output" >
 
-<div id="output" style="overflow-y:auto; height:400px;" >
 
-    <body>
     {% if results %}
     {% for res in results %}
     {{ res }}<br>
@@ -27,7 +30,5 @@
     <h1>You have nothing in output!!</h1>
     {% endif %}
 </div>
-</body>
-
 {% endblock %}
 

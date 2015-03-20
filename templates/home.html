@@ -2,10 +2,12 @@
 
 <html lang="en">
 <head>
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-1.11.2.js') }}"></script>
     {% block head %}
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
     <title>{% block title %} SASN Admin {% endblock %}</title>
     {% endblock %}
+
 </head>
 
 <body>
@@ -27,7 +29,8 @@
         {% endblock %}
     </div>
 
-    <div class="right">{% block content %}
+    <div class="right">
+        {% block content %}
         {% endblock %}
     </div>
     <div id="footer">

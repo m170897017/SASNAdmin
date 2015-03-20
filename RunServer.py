@@ -58,6 +58,8 @@ def login():
             sasn_cmd_helper.init_ssh_for_test()
 
             # clear console output everytime a user is created
+            global console_output
+            global command_number
             console_output[:] = []
             command_number = 0
             return redirect(url_for('home'))
