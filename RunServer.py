@@ -86,6 +86,29 @@ def upload_file():
 
     return render_template('loadandapply.html', error=error)
 
+@app.route('/showstatus/')
+def show_status():
+    # This is just the fake command for test, need update in the final version
+    rel_showstatus = sasn_cmd_helper.exec_cmd_test('ls')
+    #rel_showstatus = sasn_cmd_helper.exec_cmd_test("ns cluster 'ns system show status v' all-appvms")
+    return render_template('showstatus.html', results=rel_showstatus)
+
+
+@app.route('/showsessions/', methods=['GET', 'POST'])
+def show_session():
+    part_select = None
+    if request.method == 'GET':
+        global rel_showpart
+        # This is just the fake command for test, need update in the final version
+        rel_showpart = sasn_cmd_helper.exec_cmd_test('ls')
+        return render_template('showsessions.html', results_showpart=rel_showpart)
+    if request.method == 'POST':
+        part_select = request.form['partition']
+        cmd = " ".join(['ns part set', part_select])
+        show_cmd = ";".join([cmd, 'ns config scm plugin relay show session all'])
+        rel_showsession = sasn_cmd_helper.exec_cmd_test(show_cmd)
+        print rel_showsession
+        return render_template('showsessions.html', results_showpart=rel_showpart, results_showsess=rel_showsession)
 
 
 if __name__ == '__main__':
