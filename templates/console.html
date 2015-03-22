@@ -2,33 +2,31 @@
 {% block title %}SASN admin console output{% endblock %}
 
 {% block head %}
-{{ super() }}
     <script type="text/javascript">
-    $(function(){
-    $("#output").scrollTop($("#output")[0].scrollHeight);
-    });
+        $(function(){
+        $("#cmdResInConsole").scrollTop($("#cmdResInConsole")[0].scrollHeight);
+        });
     </script>
 {% endblock %}
 
 
 {% block content %}
-<form name="console_output" method="POST" action="/my_console/">
+    <form name="console_output" method="POST" action="/my_console/">
 
-    Enter a command to execute:
-    <input type="text" name="cmd"/>
-    <input type="submit" value="Submit"/>
+        Enter a command to execute:
+        <input type="text" name="cmd"/>
+        <input type="submit" value="Submit"/>
 
-</form>
-<div id="output" >
+    </form>
+    <div id="cmdResInConsole" >
 
-
-    {% if results %}
-    {% for res in results %}
-    {{ res }}<br>
-    {% endfor %}
-    {% else %}
-    <h1>You have nothing in output!!</h1>
-    {% endif %}
-</div>
+        {% if results %}
+            {% for res in results %}
+                {{ res }}<br>
+            {% endfor %}
+        {% else %}
+            <h1>Please enter a command!!</h1>
+        {% endif %}
+    </div>
 {% endblock %}
 
