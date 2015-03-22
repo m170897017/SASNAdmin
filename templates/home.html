@@ -2,44 +2,42 @@
 
 <html lang="en">
 <head>
-    <script type="text/javascript" src="{{ url_for('static', filename='jquery-1.11.2.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-1.11.2.js') }}" ></script>
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     {% block head %}
-    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
-    <title>{% block title %} SASN Admin {% endblock %}</title>
     {% endblock %}
-
+    <title>{% block title %} SASN Admin {% endblock %}</title>
 </head>
 
 <body>
-<div id="header">{% block header %}
-
-
-    <a href="/home"><img src="/static/sasnadmin.png"/></a>
-    {% endblock %}
-</div>
-<div class="wrapper"> {% block wrapper %}
-    <!--the left navigation bar-->
-    <div class="left">{% block left %}
-        <ul>
-            <li><a href="/my_console"><span>Console Output</span></a></li>
-            <li><a href="/loadandapply"><span>Load&Apply</span></a></li>
-            <li><a href="/showstatus"><span>Log out</span></a></li>
-            <li><a href="/showsessions"><span>Log out</span></a></li>
-        </ul>
-
-        {% endblock %}
+    <div id="header">
+            <a href="/home"><img src="/static/sasnadmin.png" /></a>
     </div>
 
-    <div class="right">
-        {% block content %}
-        {% endblock %}
-    </div>
-    <div id="footer">
-        {% block footer %}
-        <p>Copyright 2015 by Ericsson. Authors:Stephen Lin, Guoyan Zhang, Congcong Gu, Rainbow Sun</p>
+    <div class="wrapper">
+        {% block wrapper %}
+        <!--the left navigation bar-->
+            <div class="left">
+                {% block left %}
+                    <ul>
+                        <li><a href="/test"><span>Console Output</span></a></li>
+                        <li><a href="/loadandapply"><span>Load&Apply</span></a></li>
+                        <li><a href="/showstatus"><span>Show Status</span></a></li>
+                        <li><a href="/showsessions"><span>Show Sessions</span></a></li>
+                    </ul>
+                {% endblock %}
+            </div>
 
+            <div class="right">
+                {% block content %}
+                {% endblock %}
+            </div>
+
+            <div id="footer">
+                {% block footer %}
+                    <p>Copyright 2015 by Ericsson. Authors:Stephen Lin, Guoyan Zhang, Congcong Gu, Rainbow Sun</p>
+                {% endblock %}
+            </div>
         {% endblock %}
     </div>
-    {% endblock %}
-</div>
 </body>

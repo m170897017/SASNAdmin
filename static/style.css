@@ -1,6 +1,3 @@
-
-
-
 div {
 	border-radius: 5px;
 }
@@ -10,9 +7,11 @@ ul{
 li {
 	list-style-type: square;
     width: 200px;
+
 }
 a{
     width:200px;
+
 }
 div a{
     height: 100px;
@@ -21,13 +20,14 @@ div a{
 img {
 	height: 15%;
 	width: 400px;
-
-
-
+    border-color: #ffffff;
 }
 
 a:hover {
 	font-weight: bold;
+}
+a:visited{
+    color: blue;
 }
 
 #footer {
@@ -46,11 +46,6 @@ a:hover {
 	padding-top: 15px;
 }
 
-/*#header p {
-	position: relative;
-	padding-top: 15px;
-
-}*/
 #header {
 	z-index: 1;
     position: relative;
@@ -82,8 +77,7 @@ a:hover {
     margin-left:200px;
 }
 
-
-
+/*
 #search{
     display: block;
     background-color: cornflowerblue;
@@ -92,6 +86,7 @@ a:hover {
     height: 50px;
 	width: 200px;
 }
+*/
 #loadandapply{
     display: block;
     background-color: cornflowerblue;
@@ -100,6 +95,7 @@ a:hover {
     height: 50px;
 	width: 200px;
 }
+/*
 #show{
     display: block;
     border: 2px solid black;
@@ -108,12 +104,19 @@ a:hover {
     height: 50px;
 	width: 200px;
 }
-
-#output{
+*/
+#cmdResInConsole{
     border:1px solid black;
     background-color: aliceblue;
     height: 400px;
     overflow: scroll;
+}
+
+#outputInShowSessions{
+    border:1px solid black;
+    background-color: aliceblue;
+    max-height: 200px;
+    overflow-y: scroll;
 }
 
 .error{

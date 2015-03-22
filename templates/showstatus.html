@@ -5,14 +5,14 @@
 {% block content %}
     <div id="output">
         {% if error %}
-        <p class=error>Error: {{ error }}
+            <p class=error>Error: {{ error }}
         {% endif %}
         {% if results %}
-        {% for res in results %}
-        {{ res }}<br>
-        {% endfor %}
+            {% for res in results %}
+                {{ res }}<br>
+            {% endfor %}
         {% else %}
-        <h3>Can not get status information, try again!!</h3>
+            <h3>Can not get status information, try again!!</h3>
         {% endif %}
     </div>
 {% endblock %}

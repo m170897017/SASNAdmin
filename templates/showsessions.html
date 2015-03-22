@@ -4,46 +4,31 @@
 
 {% block content %}
 
-<form name="select_part" method="POST" action="/showsessions/ ">
-    List partitions in SASN:
-{% if results_showpart %}
-<div id="output" name="cmd">
-{% if error %}
-  <p class=error>Error: {{ error }}
-{% endif %}
-<body>
-{% if results_showpart %}
-    {% for res in results_showpart %}
-        {{ res }}<br>
-    {% endfor %}
-{% else %}
-   <h3>Can not get partition information!!</h3>
-{% endif %}
-</body>
-</div>
-{% endif %}
-</form>
+    <form name="select_part" method="POST" action="/showsessions/ ">
+        List partitions in SASN:
+        <div id="outputInShowSessions" name="cmd">
+            {% if results_showpart %}
+                {% for res in results_showpart %}
+                    {{ res }}<br>
+                {% endfor %}
+            {% else %}
+                <h3>Can not get partition information!</h3>
+            {% endif %}
+        </div>
+    </form>
 
-<form name="show_session" method="POST" action="/showsessions/" style="position:relative; top:10px;">
-Select partition [Input Number]:
-<input type="text"  name="partition"/>
-<input type="submit" value="Submit"/>
-{% if results_showsess %}
-<div id="output">
-{% if error %}
-  <p class=error>Error: {{ error }}
-{% endif %}
-<body>
-{% if results_showsess %}
-    {% for res in results_showsess %}
-        {{ res }}<br>
-    {% endfor %}
-{% else %}
-{% endif %}
-</body>
-</div>
-{% endif %}
-</form>
+    <form name="show_session" method="POST" action="/showsessions/" style="position:relative; top:10px;">
+        Select partition [Input Number]:
+        <input type="text"  name="partition"/>
+        <input type="submit" value="Submit"/>
+        <div id="outputInShowSessions">
+            {% if results_showsess %}
+                {% for res in results_showsess %}
+                    {{ res }}<br>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </form>
 
 {% endblock %}
 

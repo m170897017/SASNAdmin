@@ -24,7 +24,9 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in settings.ALLOWED_EXTENSIONS
 
-
+@app.route('/test/')
+def lchtest():
+    return render_template('console.html')
 
 @app.route('/my_console/', methods=['GET', 'POST'])
 def search():
@@ -102,12 +104,12 @@ def show_session():
         # This is just the fake command for test, need update in the final version
         rel_showpart = sasn_cmd_helper.exec_cmd_test('ls')
         return render_template('showsessions.html', results_showpart=rel_showpart)
+
     if request.method == 'POST':
         part_select = request.form['partition']
         cmd = " ".join(['ns part set', part_select])
         show_cmd = ";".join([cmd, 'ns config scm plugin relay show session all'])
         rel_showsession = sasn_cmd_helper.exec_cmd_test(show_cmd)
-        print rel_showsession
         return render_template('showsessions.html', results_showpart=rel_showpart, results_showsess=rel_showsession)
 
 
