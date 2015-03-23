@@ -105,6 +105,11 @@ a:visited{
 	width: 200px;
 }
 */
+
+#commonOutput{
+    border:1px solid black;
+    background-color: aliceblue;
+}
 #cmdResInConsole{
     border:1px solid black;
     background-color: aliceblue;

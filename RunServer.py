@@ -24,9 +24,6 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in settings.ALLOWED_EXTENSIONS
 
-@app.route('/test/')
-def lchtest():
-    return render_template('console.html')
 
 @app.route('/my_console/', methods=['GET', 'POST'])
 def search():
