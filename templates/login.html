@@ -1,17 +1,24 @@
-{% extends "home.html" %}
-{% block title %}Login SASN Admin{% endblock %}
+<!doctype html>
+<head>
+    <title>
+        Login SASN Admin
+    </title>
 
-{% if error %}
-  <p class=error>Error: {{ error }}
- {% endif %}
+</head>
 
-<form name="login_test" method="post" action="">
-    <dl>
-        <dt>Username:
-        <dd><input type="text" name="username">
-        <dt>Passowrd:
-        <dd><input type="text" name="password">
-    </dl>
-    <p><input type="submit" value="Login">
-</form>
+<body>
+    {% if error %}
+        <p class=error>Error: {{ error }}
+    {% endif %}
 
+    <form name="login_test" method="post" action="">
+        <dl>
+            <dt>Username:
+            <dd><input type="text" name="username">
+            <dt>Passowrd:
+            <dd><input type="text" name="password">
+        </dl>
+        <p><input type="submit" value="Login">
+    </form>
+
+</body>
