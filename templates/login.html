@@ -1,24 +1,60 @@
-<!doctype html>
-<head>
-    <title>
-        Login SASN Admin
-    </title>
+<!DOCTYPE html>
+<title>SASN Admin - Login </title>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='login.css') }}"/>
+
 
 </head>
 
-<body>
-    {% if error %}
-        <p class=error>Error: {{ error }}
-    {% endif %}
+<body class="small login">
 
-    <form name="login_test" method="post" action="">
-        <dl>
-            <dt>Username:
-            <dd><input type="text" name="username">
-            <dt>Passowrd:
-            <dd><input type="text" name="password">
-        </dl>
-        <p><input type="submit" value="Login">
-    </form>
+	<div id="header">
+		<div class="wrapper">
+            <h1 style="font-size:50px;">SASN Admin</h1>
+		</div>
+	</div>
+
+    <div id="container">
+    	<div id="content">
+    		<div class="wrapper">
+
+				<form name="Login" method="post" action="">
+				<input type="hidden" value="false" name="returning" id="returning" />
+					<table class="login" style="margin-left: auto; margin-right: auto;">
+						<tr>
+							<td><p class="mtop0 mbottom025"><strong><label for="username">Username</label></strong></p><input id="username" tabindex="1" class="inputtext" type="text" name="username" /></td>
+						</tr>
+						<tr>
+							<td><p class="mtop05 mbottom025"><strong><label for="password">Password</label></strong></p><input id="password" tabindex="2" class="inputtext" type="password" name="password"  /></td>
+						</tr>
+
+                        {% if error %}
+                            <div class="error">
+                            Error: {{ error }}
+                            </div>
+                        {% endif %}
+
+						<tr>
+							<td style="padding-top: 10px;"><input class="public-button" type="submit" tabindex="3" value="Log in" /></td>
+						</tr>
+					</table>
+				</form>
+
+            </div> <!-- wrapper -->
+		</div> <!-- content -->
+	</div> <!-- container -->
+
+    <div id="footer">
+        <div class="wrapper">
+            <p>
+			<a href="/help/"><span>Help</span></a> <span class="bar">|</span>
+			<a href="/contact/">Contact</a>
+		</p>
+            <p id="copyright">Copyright 2015 by Ericsson. Authors:Stephen Lin, Guoyan Zhang, Congcong Gu, Rainbow Sun. All rights reserved. </p>
 
 </body>
+
+</html>
+
