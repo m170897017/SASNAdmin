@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 '''
 Created on Nov 20, 2014
 
@@ -20,6 +20,7 @@ app.config['MAX_CONTENT_LENGTH'] = settings.MAX_CONTENT_LENGTH
 console_output = []
 command_number = 0
 
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in settings.ALLOWED_EXTENSIONS
@@ -29,19 +30,19 @@ def allowed_file(filename):
 def search():
     global command_number
     if request.method == 'POST':
-
-        console_output.append('-'*40+'\n')
-        console_output.append('In[%d]: ' % command_number + request.form['cmd'])
-        console_output.append('Out[%d]: \n' % command_number)
-        console_output.extend(sasn_cmd_helper.exec_cmd_test(request.form['cmd']))
+        console_output.extend(
+            ['=' * 40, '\n', 'In[%d]: ' % command_number, '\n', request.form['cmd'], '\n', 'Out[%d]: ' % command_number,
+             '\n', sasn_cmd_helper.exec_cmd_test(request.form['cmd'])])
         command_number += 1
         return render_template('console.html', results=console_output)
     else:
         return render_template('console.html')
 
+
 @app.route('/home/')
 def home():
     return render_template('home.html')
+
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -85,11 +86,12 @@ def upload_file():
 
     return render_template('loadandapply.html', error=error)
 
+
 @app.route('/showstatus/')
 def show_status():
     # This is just the fake command for test, need update in the final version
-    rel_showstatus = sasn_cmd_helper.exec_cmd_test('ls')
-    #rel_showstatus = sasn_cmd_helper.exec_cmd_test("ns cluster 'ns system show status v' all-appvms")
+    # rel_showstatus = sasn_cmd_helper.exec_cmd_test('ls')
+    rel_showstatus = sasn_cmd_helper.exec_cmd_test("ns cluster 'ns system show status v' all-appvms")
     return render_template('showstatus.html', results=rel_showstatus)
 
 
@@ -111,5 +113,4 @@ def show_session():
 
 
 if __name__ == '__main__':
-     
     app.run(debug=True)

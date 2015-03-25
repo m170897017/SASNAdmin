@@ -29,8 +29,13 @@ class SASNCMDHelper():
         self.test.connect(hostname=settings.HOST_IP, username=settings.HOST_USERNAME, password=settings.HOST_PASSWORD)
 
     def exec_cmd_test(self, cmd):
-        stdin, stdout, stderr = self.test.exec_command(cmd)
-        return stdout.readlines()
+        stdin, stdout, stderr = self.test.exec_command(self.__cmd_for_test(cmd))
+        stdout_info = stdout.readlines()
+        if stdout_info:
+            return stdout_info
+        stderr_info = stderr.readlines()
+        if stderr_info:
+            return stderr_info
 
     def exec_cmd(self, cmd):
         stdin, stdout, stderr = self.rp.exec_command(self.__cmd_for(cmd))
@@ -38,6 +43,13 @@ class SASNCMDHelper():
 
     def __cmd_for(self, cmd):
         return settings.RP_NSSH + ' "' + cmd + '"'
+
+    def __cmd_for_test(self, cmd):
+        if cmd.find('"'):
+            cmd = cmd.replace('"', '\\\'')
+        if cmd.find('\''):
+            cmd = cmd.replace('\'', '\\\'')
+        return settings.TEST_NSSH % cmd
 
 
 if __name__ == '__main__':

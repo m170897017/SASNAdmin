@@ -10,6 +10,7 @@ RP_USERNAME_ADMIN = 'admin'
 RP_PASSWORD_ADMIN = 'admin'
 
 RP_NSSH = '/opt/disk/service-pools/sasnpool/active/bin/nssh -c'
+TEST_NSSH = 'ssh root@11.13.20.15 /opt/disk/service-pools/sasnpool/active/bin/nssh -c \\\"%s\\\"'
 
 HOST_IP = '10.65.100.22'
 HOST_USERNAME = 'root'
