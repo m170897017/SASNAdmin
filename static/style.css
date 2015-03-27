@@ -106,23 +106,23 @@ a:visited{
 }
 */
 
-#commonOutput{
-    border:1px solid black;
-    background-color: aliceblue;
-    overflow: scroll;
-}
-#cmdResInConsole{
+.commonOutput{
     border:1px solid black;
     background-color: aliceblue;
     height: 400px;
-    overflow: scroll;
+    overflow: auto;
 }
 
-#outputInShowSessions{
+.outputInShowSessions{
     border:1px solid black;
     background-color: aliceblue;
     max-height: 200px;
-    overflow-y: scroll;
+    overflow-y: auto;
+}
+
+#cmdInputInConsole{
+
+    width: 90%;
 }
 
 .error{

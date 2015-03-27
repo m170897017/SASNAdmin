@@ -13,12 +13,11 @@
 {% block content %}
     <form name="console_output" method="POST" action="/my_console/">
 
-        Enter a command to execute:
-        <input type="text" name="cmd"/>
+        <input id="cmdInputInConsole" type="text" name="cmd" />
         <input type="submit" value="Submit"/>
 
     </form>
-    <div id="cmdResInConsole" >
+    <div class="commonOutput" >
 
         {% if results %}
             {% for res in results %}
