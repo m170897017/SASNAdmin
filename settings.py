@@ -17,6 +17,6 @@ HOST_USERNAME = 'root'
 HOST_PASSWORD = 'rootroot'
 
 UPLOAD_FOLDER = 'C:\\temp\\kk'
-ALLOWED_EXTENSIONS = set(['wzd', 'cfg', 'conf'])
+ALLOWED_EXTENSIONS = ['wzd', 'cfg', 'conf']
 MAX_CONTENT_LENGTH = 160 * 1024 * 1024
 

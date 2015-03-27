@@ -45,9 +45,9 @@ class SASNCMDHelper():
         return settings.RP_NSSH + ' "' + cmd + '"'
 
     def __cmd_for_test(self, cmd):
-        if cmd.find('"'):
+        if cmd.find('\"') != -1:
             cmd = cmd.replace('"', '\\\'')
-        if cmd.find('\''):
+        elif cmd.find('\'') != -1:
             cmd = cmd.replace('\'', '\\\'')
         return settings.TEST_NSSH % cmd
 

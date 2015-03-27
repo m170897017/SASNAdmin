@@ -32,7 +32,8 @@ def search():
     if request.method == 'POST':
         console_output.extend(
             ['=' * 40, '\n', 'In[%d]: ' % command_number, '\n', request.form['cmd'], '\n', 'Out[%d]: ' % command_number,
-             '\n', sasn_cmd_helper.exec_cmd_test(request.form['cmd'])])
+             '\n', ])
+        console_output.extend(sasn_cmd_helper.exec_cmd_test(request.form['cmd']))
         command_number += 1
         return render_template('console.html', results=console_output)
     else:
