@@ -7,7 +7,7 @@ Created on Nov 20, 2014
 '''
 import os
 
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, session, abort, flash
 from werkzeug import secure_filename
 
 from CMDHelper import SASNCMDHelper
@@ -17,6 +17,7 @@ app = Flask(__name__)
 
 app.config['UPLOAD_FOLDER'] = settings.UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = settings.MAX_CONTENT_LENGTH
+app.config['SECRET_KEY'] = 'development key'
 console_output = []
 command_number = 0
 
@@ -28,6 +29,8 @@ def allowed_file(filename):
 
 @app.route('/my_console/', methods=['GET', 'POST'])
 def search():
+    if not session.get('logged_in'):
+        abort(401)
     global command_number
     if request.method == 'POST':
         console_output.extend(
@@ -42,8 +45,13 @@ def search():
 
 @app.route('/home/')
 def home():
+    if not session.get('logged_in'):
+        abort(401)
     return render_template('home.html')
 
+@app.errorhandler(401)
+def page_need_authorization(error):
+    return render_template('401.html'), 401
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -63,13 +71,22 @@ def login():
             global command_number
             console_output[:] = []
             command_number = 0
+            session['logged_in'] = True
             return redirect(url_for('home'))
 
     return render_template('login.html', error=error)
 
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
+
+
 
 @app.route('/loadandapply/', methods=['GET', 'POST'])
 def upload_file():
+    if not session.get('logged_in'):
+        abort(401)
     error = None
     upload_result = None
     if request.method == 'POST':
@@ -92,12 +109,16 @@ def upload_file():
 def show_status():
     # This is just the fake command for test, need update in the final version
     # rel_showstatus = sasn_cmd_helper.exec_cmd_test('ls')
+    if not session.get('logged_in'):
+        abort(401)
     rel_showstatus = sasn_cmd_helper.exec_cmd_test("ns cluster 'ns system show status v' all-appvms")
     return render_template('showstatus.html', results=rel_showstatus)
 
 
 @app.route('/showsessions/', methods=['GET', 'POST'])
 def show_session():
+    if not session.get('logged_in'):
+        abort(401)
     part_select = None
     if request.method == 'GET':
         global rel_showpart
