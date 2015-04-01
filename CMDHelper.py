@@ -1,15 +1,16 @@
-#!/usr/bin/env python
-#-*- coding:utf-8 -*-
+# !/usr/bin/env python
+# -*- coding:utf-8 -*-
 __author__ = 'eccglln'
-
 
 import paramiko
 import settings
 
+
 class SASNCMDHelper():
-    '''
+    """
     This is helper for SASN command execution.
-    '''
+    """
+
     def __init__(self):
         self.rp = None
         self.test = None
@@ -53,7 +54,6 @@ class SASNCMDHelper():
 
 
 if __name__ == '__main__':
-
     # ssh = paramiko.SSHClient()
     # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     # ssh.connect('10.65.100.22', username='root', password='rootroot')
@@ -64,4 +64,3 @@ if __name__ == '__main__':
     my_helper = SASNCMDHelper()
     my_helper.exec_cmd_test('date')
     # my_helper.exec_cmd("ns cluster 'ns system show status v' all-appvms")
-
