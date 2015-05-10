@@ -1,0 +1,15 @@
+2015.5.10
+
+load/apply function (check current SASN configuration)   lin
+monitor: show control session/ICAP/cfe/alarm/smlsmg   rainbow  
+UDR/UDR decode and show   guoyan
+home description(SDK version/show vm-intanse/show version/)  lin  
+
+know different roles and different authorizes  congcong
+
+
+one key install SASN
+one key install SDK
+check SASN messages
+
+Make SASN configurable through web page

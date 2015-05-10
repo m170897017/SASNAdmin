@@ -20,6 +20,7 @@
             <div class="left">
                 {% block left %}
                     <ul>
+                        <li><a href="/home"><span>Home</span></a></li>
                         <li><a href="/my_console"><span>Console Output</span></a></li>
                         <li><a href="/loadandapply"><span>Load&Apply</span></a></li>
                         <li><a href="/showstatus"><span>Show Status</span></a></li>
@@ -30,6 +31,9 @@
             </div>
 
             <div class="right">
+                {% if sasn_status %}
+                    {{ sasn_status }}
+                {% endif %}
                 {% block content %}
                 {% endblock %}
             </div>

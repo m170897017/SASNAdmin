@@ -45,7 +45,8 @@ def search():
 def home():
     if not session.get('logged_in'):
         abort(401)
-    return render_template('home.html')
+    sasn_status = sasn_cmd_helper.exec_cmd_test('ns version')
+    return render_template('home.html', sasn_status=sasn_status)
 
 
 @app.errorhandler(401)
