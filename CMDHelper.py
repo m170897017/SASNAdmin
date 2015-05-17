@@ -4,6 +4,7 @@ __author__ = 'eccglln'
 
 import paramiko
 import settings
+import SASNCommands
 
 
 class SASNCMDHelper():
@@ -51,6 +52,24 @@ class SASNCMDHelper():
         elif cmd.find('\'') != -1:
             cmd = cmd.replace('\'', '\\\'')
         return settings.TEST_NSSH % cmd
+
+    def get_software_information(self):
+        '''
+        :return: Software information of all SASN VMs
+        format is soft_info[heuristics_release_for_vm0, vm0_heuristics_installed_for_vm0, sasn_vpf_release_for_vm0, ...]
+        Every three elements are for one SASN VM.
+        '''
+        sasn_status = self.exec_cmd_test(SASNCommands.SHOW_SOFTWARE_INFO)
+        soft_info = []
+        for status_info in sasn_status:
+            if 'heuristics' in status_info:
+                info = status_info.split()
+                soft_info.append(info[2])
+                soft_info.append(' '.join(info[3:]))
+            if 'sasn-vpf' in status_info:
+                info = status_info.split()
+                soft_info.append(info[2])
+        return soft_info
 
 
 if __name__ == '__main__':

@@ -45,8 +45,11 @@ def search():
 def home():
     if not session.get('logged_in'):
         abort(401)
-    sasn_status = sasn_cmd_helper.exec_cmd_test('ns version')
-    return render_template('home.html', sasn_status=sasn_status)
+    # get latest sasn status every time
+    session['sasn_status'] = sasn_cmd_helper.get_software_information()
+    # since we only get three kinds of info for sasn vms, we divide it by 3 in html file
+    session['sasn_info_num'] = len(session['sasn_status'])
+    return render_template('status.html', sasn_software_info=session['sasn_status'], sasn_info_num=session['sasn_info_num'])
 
 
 @app.errorhandler(401)

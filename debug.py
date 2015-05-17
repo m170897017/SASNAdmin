@@ -1,30 +1,9 @@
 #!/usr/bin/env python
 
-# import paramiko
-#
-# ssh = paramiko.SSHClient()
-# ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-# ssh.connect(hostname='10.65.100.22', username='root', password='rootroot')
-# cmd = '''ssh root@11.13.20.15 /opt/disk/service-pools/sasnpool/active/bin/nssh -c \\"ns cluster \\'ns system show status\\' all-appvms\\"'''
-# cmd1 = 'ssh root@11.13.20.15 hostname'
-# stdin, stdout, stderr = ssh.exec_command(cmd)
-# # print 'stdin: ', stdin.readlines()
-# print 'stdout: ', stdout.readlines()
-# print 'stderr: ', stderr.readlines()
+a = [u'perl: warning: Setting locale failed.\n', u'perl: warning: Please check that your locale settings:\n', u'\tLANGUAGE = (unset),\n', u'\tLC_ALL = (unset),\n', u'\tLC_CTYPE = "en_US.UTF-8",\n', u'\tLANG = "C"\n', u' are supported and installed on your system.\n', u'perl: warning: Falling back to the standard locale ("C").\n', u'Command was launched from partition 0.\n', u'\n', u'------------------------------------------------\n', u'Executing command in server sasnvm0\n', u'\n', u'Name Type Release Installed\n', u'heuristics dist 4.3-168 May 13 02:06:51 2015\n', u'\n', u'Name Type Release \n', u'sasn-vpf rpm 10.R3A03_00_CBC_SSR_14A_FP37852_OSI_SUPPORT_2\n', u'\n', u'------------------------------------------------\n', u'Executing command in server sasnvm1\n', u'\n', u'Name Type Release Installed\n', u'heuristics dist 4.3-168 May 13 02:06:51 2015\n', u'\n', u'Name Type Release \n', u'sasn-vpf rpm 10.R3A03_00_CBC_SSR_14A_FP37852_OSI_SUPPORT_2\n']
+for i in a:
+
+    print i
 
 
-def dec(func):
-    print 'in dec'
-    return func
-
-def dec2(func):
-    print 'in dec2'
-    return func
-
-@dec2
-@dec
-def test():
-    print 'in test'
-
-test()
 

@@ -3,7 +3,8 @@
 load/apply function (check current SASN configuration)   lin
 monitor: show control session/ICAP/cfe/alarm/smlsmg   rainbow  
 UDR/UDR decode and show   guoyan
-home description(SDK version/show vm-intanse/show version/)  lin  
+
+home description(SDK version/show vm-intanse/show version/)  lin  Done
 
 know different roles and different authorizes  congcong
 
