@@ -14,3 +14,11 @@ one key install SDK
 check SASN messages
 
 Make SASN configurable through web page
+
+2015.5.25
+two releases
+one for customer usage, installed on RP, based on Python3.2
+one for internal usage, installed on Host, based on Python2.6, for SSR-sim
+
+add vm choice
+use thread to create user to sasn

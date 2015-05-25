@@ -15,7 +15,7 @@ import settings
 
 app = Flask(__name__)
 
-app.config['UPLOAD_FOLDER'] = settings.UPLOAD_FOLDER
+
 app.config['MAX_CONTENT_LENGTH'] = settings.MAX_CONTENT_LENGTH
 app.config['SECRET_KEY'] = 'development key'
 
@@ -94,8 +94,8 @@ def upload_file():
         config_file = request.files['file']
         if config_file and allowed_file(config_file.filename):
             filename = secure_filename(config_file.filename)
-
-            config_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            current_dir = os.path.dirname(os.path.abspath(__file__)) + '\\static'
+            config_file.save(os.path.join(current_dir, filename))
 
             upload_result = "Success"
 
@@ -135,4 +135,5 @@ def show_session():
 
 
 if __name__ == '__main__':
+
     app.run(debug=True)

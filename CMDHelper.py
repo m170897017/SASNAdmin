@@ -21,16 +21,38 @@ class SASNCMDHelper():
         self.test.close()
 
     def init_ssh_to_rp(self):
+        '''
+        Creating connection towards RP card.
+        :return: None
+        '''
         self.rp = paramiko.SSHClient()
         self.rp.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.rp.connect(settings.RP_IP, username=settings.RP_USERNAME, password=settings.RP_PASSWORD)
 
     def init_ssh_for_test(self):
+        '''
+        Creating connection towards host.
+        :return: None
+        '''
         self.test = paramiko.SSHClient()
         self.test.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.test.connect(hostname=settings.HOST_IP, username=settings.HOST_USERNAME, password=settings.HOST_PASSWORD)
 
+    def exec_cmd(self, cmd):
+        '''
+        Execute commands in RP card and return results.
+        :param cmd: Command to be executed.
+        :return: execution results
+        '''
+        stdin, stdout, stderr = self.rp.exec_command(self.__cmd_for(cmd))
+        return stderr.readlines()
+
     def exec_cmd_test(self, cmd):
+        '''
+        Execute commands in Host and return results.
+        :param cmd: Command to be executed.
+        :return: execution results
+        '''
         stdin, stdout, stderr = self.test.exec_command(self.__cmd_for_test(cmd))
         stdout_info = stdout.readlines()
         if stdout_info:
@@ -39,14 +61,20 @@ class SASNCMDHelper():
         if stderr_info:
             return stderr_info
 
-    def exec_cmd(self, cmd):
-        stdin, stdout, stderr = self.rp.exec_command(self.__cmd_for(cmd))
-        return stderr.readlines()
-
     def __cmd_for(self, cmd):
+        '''
+        Format command line in order to be executed in RP card.
+        :param cmd: Command to be executed.
+        :return: None
+        '''
         return settings.RP_NSSH + ' "' + cmd + '"'
 
     def __cmd_for_test(self, cmd):
+        '''
+        Format command line in order to be executed in Host.
+        :param cmd: Command to be executed.
+        :return: None
+        '''
         if cmd.find('\"') != -1:
             cmd = cmd.replace('"', '\\\'')
         elif cmd.find('\'') != -1:
@@ -55,6 +83,7 @@ class SASNCMDHelper():
 
     def get_software_information(self):
         '''
+        Get software information for all SASN VMs.
         :return: Software information of all SASN VMs
         format is soft_info[heuristics_release_for_vm0, vm0_heuristics_installed_for_vm0, sasn_vpf_release_for_vm0, ...]
         Every three elements are for one SASN VM.

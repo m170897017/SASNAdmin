@@ -1,0 +1,12 @@
+#!/usr/bin/expect -f
+set timeout 10
+spawn ssh admin@{{ ip }}
+expect "*password"
+send "admin\r"
+expect "*Redback>"
+send "en\r"
+expect "Password:"
+send "test\r"
+expect "*Redback"
+send "{{ cmd }}\r"
+expect "*Redback"

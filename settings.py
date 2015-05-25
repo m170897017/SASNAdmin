@@ -10,13 +10,14 @@ RP_USERNAME_ADMIN = 'admin'
 RP_PASSWORD_ADMIN = 'admin'
 
 RP_NSSH = '/opt/disk/service-pools/sasnpool/active/bin/nssh -c'
+# ssh from host to rp to execute commands
 TEST_NSSH = 'ssh root@11.13.20.15 /opt/disk/service-pools/sasnpool/active/bin/nssh -c \\\"%s\\\"'
 
 HOST_IP = '10.65.100.22'
 HOST_USERNAME = 'root'
 HOST_PASSWORD = 'rootroot'
 
-UPLOAD_FOLDER = 'C:\\temp\\kk'
+
 ALLOWED_EXTENSIONS = ['wzd', 'cfg', 'conf']
 MAX_CONTENT_LENGTH = 160 * 1024 * 1024
 
