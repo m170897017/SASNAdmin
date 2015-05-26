@@ -1,6 +1,6 @@
 #!/usr/bin/expect -f
 set timeout 10
-spawn ssh admin@{{ ip }}
+spawn ssh admin@11.13.20.15
 expect "*password"
 send "admin\r"
 expect "*Redback>"
@@ -8,6 +8,6 @@ send "en\r"
 expect "Password:"
 send "test\r"
 expect "*Redback"
-send "{{ command }}\r"
+send "show card\r"
 expect "*Redback"
 send "exit\r"

@@ -74,6 +74,11 @@ def login():
             session['console_output'] = []
             session['command_number'] = 0
             session['logged_in'] = True
+
+            # clean temp dictionary according to OS
+            # if os is windows
+            # os.system('rm -r temp/*')
+
             return redirect(url_for('home'))
 
     return render_template('login.html', error=error)
@@ -93,11 +98,11 @@ def upload_file():
     if request.method == 'POST':
         config_file = request.files['file']
         if config_file and allowed_file(config_file.filename):
-            filename = secure_filename(config_file.filename)
-            current_dir = os.path.dirname(os.path.abspath(__file__)) + '\\static'
-            config_file.save(os.path.join(current_dir, filename))
-
-            upload_result = "Success"
+            config_file.save(settings.CONFIG_FILE_PATH)
+            if sasn_cmd_helper.load_apply(settings.CONFIG_FILE_PATH):
+                upload_result = "Success"
+            else:
+                upload_result = 'Load apply failed.'
 
             return render_template('loadandapply.html', upload_result=upload_result)
         else:

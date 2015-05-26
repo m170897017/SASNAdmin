@@ -2,12 +2,15 @@
 # -*- coding:utf-8 -*-
 __author__ = 'eccglln'
 
+import os
 import paramiko
+from jinja2 import Environment, FileSystemLoader
+
 import settings
 import SASNCommands
 
 
-class SASNCMDHelper():
+class SASNCMDHelper(object):
     """
     This is helper for SASN command execution.
     """
@@ -99,6 +102,42 @@ class SASNCMDHelper():
                 info = status_info.split()
                 soft_info.append(info[2])
         return soft_info
+
+    def load_apply(self, config_file):
+        '''
+        Upload config file to RP and load apply.
+        :param config_file: path of config file.
+        :return: True if load apply successfully or False
+        '''
+
+        load_apply_script = self.__render_template('loadApply', ip=settings.RP1_IP, command='show card')
+
+        # put config file onto server using sftp
+        sftp_con = self.test.open_sftp()
+        sftp_con.put(load_apply_script, '/tmp/loadApply')
+        sftp_con.put(config_file, '/tmp/config.com')
+        sftp_con.close()
+        self.test.exec_command('chmod 744 /tmp/loadApply')
+        stdin, stdout, stderr = self.test.exec_command('/tmp/loadApply')
+        print 'stdout is: ', stdout.readlines()
+
+        return True
+        # return True if 'OK' in results else False
+
+    def __render_template(self, template_name, **kargs):
+        '''
+        Render template with specific parameters and save file to temp folder.
+        :param template_name: Name of template file under templates folder.
+        :return: Path of rendered file in temp folder.
+        '''
+        cwd = os.path.dirname(os.path.abspath(__file__))
+        template_file = os.path.join('templates/', template_name)
+        target_file = os.path.join(cwd, 'temp', template_name)
+        j2_env = Environment(loader=FileSystemLoader(cwd), trim_blocks=True)
+        data = j2_env.get_template(template_file).render(**kargs)
+        with open(target_file, 'wb') as f:
+            f.write(data)
+        return target_file
 
 
 if __name__ == '__main__':
