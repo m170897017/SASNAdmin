@@ -3,6 +3,7 @@
 __author__ = 'eccglln'
 
 import os
+import time
 import paramiko
 from jinja2 import Environment, FileSystemLoader
 
@@ -110,19 +111,33 @@ class SASNCMDHelper(object):
         :return: True if load apply successfully or False
         '''
 
-        load_apply_script = self.__render_template('loadApply', ip=settings.RP1_IP, command='show card')
+        load_apply_file_on_host = '/tmp/loadApply'
+        load_apply_command = 'configure /tmp/loadApply single-app-commit'
+        load_apply_script = self.__render_template('loadApply', local_file_path=load_apply_file_on_host,
+                                                   ip=settings.RP1_IP, command=load_apply_command)
 
         # put config file onto server using sftp
         sftp_con = self.test.open_sftp()
-        sftp_con.put(load_apply_script, '/tmp/loadApply')
+        sftp_con.put(load_apply_script, load_apply_file_on_host)
         sftp_con.put(config_file, '/tmp/config.com')
         sftp_con.close()
         self.test.exec_command('chmod 744 /tmp/loadApply')
-        stdin, stdout, stderr = self.test.exec_command('/tmp/loadApply')
-        print 'stdout is: ', stdout.readlines()
+        self.test.exec_command('/tmp/loadApply')
 
-        return True
-        # return True if 'OK' in results else False
+        return True if self.__if_commit_done() else False
+
+    def __if_commit_done(self):
+        '''
+        Check if there is still commit in progress. Checking for 15s tops.
+        :return: True if there is no commit in progress else False.
+        '''
+        retry_time = 3
+        while retry_time >0:
+            if 'No commit in progress' in self.exec_cmd_test(SASNCommands.SHOW_COMMIT_PROGRESS):
+                return True
+            retry_time -= 1
+            time.sleep(5)
+        return False
 
     def __render_template(self, template_name, **kargs):
         '''

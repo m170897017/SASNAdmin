@@ -5,16 +5,13 @@ Created on Nov 20, 2014
 
 @author: eccglln
 """
-import os
 
 from flask import Flask, render_template, request, redirect, url_for, session, abort
-from werkzeug.utils import secure_filename
 
 from CMDHelper import SASNCMDHelper
 import settings
 
 app = Flask(__name__)
-
 
 app.config['MAX_CONTENT_LENGTH'] = settings.MAX_CONTENT_LENGTH
 app.config['SECRET_KEY'] = 'development key'
@@ -49,7 +46,8 @@ def home():
     session['sasn_status'] = sasn_cmd_helper.get_software_information()
     # since we only get three kinds of info for sasn vms, we divide it by 3 in html file
     session['sasn_info_num'] = len(session['sasn_status'])
-    return render_template('status.html', sasn_software_info=session['sasn_status'], sasn_info_num=session['sasn_info_num'])
+    return render_template('status.html', sasn_software_info=session['sasn_status'],
+                           sasn_info_num=session['sasn_info_num'])
 
 
 @app.errorhandler(401)
@@ -102,7 +100,7 @@ def upload_file():
             if sasn_cmd_helper.load_apply(settings.CONFIG_FILE_PATH):
                 upload_result = "Success"
             else:
-                upload_result = 'Load apply failed.'
+                upload_result = 'Load apply failed! Please load apply again!'
 
             return render_template('loadandapply.html', upload_result=upload_result)
         else:
@@ -140,5 +138,4 @@ def show_session():
 
 
 if __name__ == '__main__':
-
     app.run(debug=True)

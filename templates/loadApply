@@ -1,4 +1,7 @@
 #!/usr/bin/expect -f
+spawn scp {{ local_file_path }} root@{{ ip }}
+# expect "*password"
+# send "root\r"
 set timeout 10
 spawn ssh admin@{{ ip }}
 expect "*password"
