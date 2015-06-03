@@ -49,6 +49,7 @@ def home():
     session['sasn_status'] = sasn_cmd_helper.get_software_information()
     # since we only get three kinds of info for sasn vms, we divide it by 3 in html file
     session['sasn_info_num'] = len(session['sasn_status'])
+    print "trans key to RP"
     return render_template('status.html', sasn_software_info=session['sasn_status'], sasn_info_num=session['sasn_info_num'])
 
 
@@ -74,7 +75,7 @@ def login():
             session['console_output'] = []
             session['command_number'] = 0
             session['logged_in'] = True
-
+            sasn_cmd_helper.rsa_key_trans()
             # clean temp dictionary according to OS
             # if os is windows
             # os.system('rm -r temp/*')
@@ -109,6 +110,28 @@ def upload_file():
             error = 'Invalid extension of file, should end with wzd, cfg or conf'
 
     return render_template('loadandapply.html', error=error)
+
+
+@app.route('/cdrDecoder/', methods=['GET', 'POST'])
+def decode_CDR():
+    if not session.get('logged_in'):
+        abort(401)
+    error = None
+    if request.method == 'POST':
+        config_file = request.files['file']
+        if config_file:
+            config_file.save(settings.CDR_FILE_PATH)
+            result = sasn_cmd_helper.cdrDecode(settings.CDR_FILE_PATH)
+            if result != None:
+                upload_result = "Success"
+            else:
+                upload_result = 'Decode failed'
+
+            return render_template('cdrDecoder.html', upload_result=upload_result,result=result)
+
+
+    return render_template('cdrDecoder.html', error=error)
+
 
 
 @app.route('/showstatus/')

@@ -1,0 +1,40 @@
+{% extends "home.html" %}
+{% block title %}cdr decoder{% endblock %}
+
+{% block head %}
+    <script type="text/javascript">
+        $(function(){
+        $(".output").scrollTop($(".output")[0].scrollHeight);
+        });
+    </script>
+{% endblock %}
+{% block content %}
+    <form action="" method=post enctype=multipart/form-data>
+        <p>
+            <input type=file name=file value=UploadFile>
+            <input type=submit value=Decode>
+        </p>
+    </form>
+
+  {% if error %}
+    <div id="output">
+        <p class=error>Error: {{ error }}
+    </div>
+  {% endif %}
+
+  {% if upload_result %}
+        <div class="commonOutput">
+
+          {% for line in result %}
+
+
+                     <p class=success>{{ line }}</p>
+
+             {% endfor %}
+
+
+
+        </div>
+ {% endif %}
+
+{% endblock %}
