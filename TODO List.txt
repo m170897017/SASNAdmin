@@ -1,0 +1,24 @@
+2015.5.10
+
+load/apply function (check current SASN configuration)   lin
+monitor: show control session/ICAP/cfe/alarm/smlsmg   rainbow  
+UDR/UDR decode and show   guoyan
+
+home description(SDK version/show vm-intanse/show version/)  lin  Done
+
+know different roles and different authorizes  congcong
+
+
+one key install SASN
+one key install SDK
+check SASN messages
+
+Make SASN configurable through web page
+
+2015.5.25
+two releases
+one for customer usage, installed on RP, based on Python3.2
+one for internal usage, installed on Host, based on Python2.6, for SSR-sim
+
+add vm choice
+use thread to create user to sasn

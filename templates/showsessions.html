@@ -6,7 +6,7 @@
 
     <form name="select_part" method="POST" action="/showsessions/ ">
         List partitions in SASN:
-        <div id="outputInShowSessions" name="cmd">
+        <div class="outputInShowSessions" name="cmd">
             {% if results_showpart %}
                 {% for res in results_showpart %}
                     {{ res }}<br>
@@ -21,7 +21,7 @@
         Select partition [Input Number]:
         <input type="text"  name="partition"/>
         <input type="submit" value="Submit"/>
-        <div id="outputInShowSessions">
+        <div class="outputInShowSessions">
             {% if results_showsess %}
                 {% for res in results_showsess %}
                     {{ res }}<br>

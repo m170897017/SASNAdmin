@@ -4,7 +4,7 @@
 {% block head %}
     <script type="text/javascript">
         $(function(){
-        $("#cmdResInConsole").scrollTop($("#cmdResInConsole")[0].scrollHeight);
+        $(".commonOutput").scrollTop($(".commonOutput")[0].scrollHeight);
         });
     </script>
 {% endblock %}
@@ -13,12 +13,11 @@
 {% block content %}
     <form name="console_output" method="POST" action="/my_console/">
 
-        Enter a command to execute:
-        <input type="text" name="cmd"/>
+        <input id="cmdInputInConsole" type="text" name="cmd" />
         <input type="submit" value="Submit"/>
 
     </form>
-    <div id="cmdResInConsole" >
+    <div class="commonOutput" >
 
         {% if results %}
             {% for res in results %}

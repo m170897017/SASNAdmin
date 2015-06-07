@@ -1,24 +1,24 @@
 #!/usr/bin/env python
-#-*- coding:utf-8 -*-
-'''
+# -*- coding:utf-8 -*-
+"""
 Created on Nov 20, 2014
 
 @author: eccglln
-'''
+"""
 import os
 
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
-from werkzeug import secure_filename
+from flask import Flask, render_template, request, redirect, url_for, session, abort
+from werkzeug.utils import secure_filename
 
 from CMDHelper import SASNCMDHelper
 import settings
 
 app = Flask(__name__)
 
-app.config['UPLOAD_FOLDER'] = settings.UPLOAD_FOLDER
+
 app.config['MAX_CONTENT_LENGTH'] = settings.MAX_CONTENT_LENGTH
-console_output = []
-command_number = 0
+app.config['SECRET_KEY'] = 'development key'
+
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -27,21 +27,36 @@ def allowed_file(filename):
 
 @app.route('/my_console/', methods=['GET', 'POST'])
 def search():
-    global command_number
+    if not session.get('logged_in'):
+        abort(401)
     if request.method == 'POST':
-
-        console_output.append('-'*40+'\n')
-        console_output.append('In[%d]: ' % command_number + request.form['cmd'])
-        console_output.append('Out[%d]: \n' % command_number)
-        console_output.extend(sasn_cmd_helper.exec_cmd_test(request.form['cmd']))
-        command_number += 1
-        return render_template('console.html', results=console_output)
+        session['console_output'].extend(
+            ['=' * 40, '\n', 'In[%d]: ' % session['command_number'], '\n', request.form['cmd'], '\n',
+             'Out[%d]: ' % session['command_number'],
+             '\n', ])
+        session['console_output'].extend(sasn_cmd_helper.exec_cmd_test(request.form['cmd']))
+        session['command_number'] += 1
+        return render_template('console.html', results=session['console_output'])
     else:
         return render_template('console.html')
 
+
 @app.route('/home/')
 def home():
-    return render_template('home.html')
+    if not session.get('logged_in'):
+        abort(401)
+    # get latest sasn status every time
+    session['sasn_status'] = sasn_cmd_helper.get_software_information()
+    # since we only get three kinds of info for sasn vms, we divide it by 3 in html file
+    session['sasn_info_num'] = len(session['sasn_status'])
+    print "trans key to RP"
+    return render_template('status.html', sasn_software_info=session['sasn_status'], sasn_info_num=session['sasn_info_num'])
+
+
+@app.errorhandler(401)
+def page_need_authorization():
+    return render_template('401.html'), 401
+
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -57,27 +72,38 @@ def login():
             sasn_cmd_helper.init_ssh_for_test()
 
             # clear console output everytime a user is created
-            global console_output
-            global command_number
-            console_output[:] = []
-            command_number = 0
+            session['console_output'] = []
+            session['command_number'] = 0
+            session['logged_in'] = True
+            sasn_cmd_helper.rsa_key_trans()
+            # clean temp dictionary according to OS
+            # if os is windows
+            # os.system('rm -r temp/*')
+
             return redirect(url_for('home'))
 
     return render_template('login.html', error=error)
 
 
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
+
+
 @app.route('/loadandapply/', methods=['GET', 'POST'])
 def upload_file():
+    if not session.get('logged_in'):
+        abort(401)
     error = None
-    upload_result = None
     if request.method == 'POST':
-        file = request.files['file']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-            upload_result = "Success"
+        config_file = request.files['file']
+        if config_file and allowed_file(config_file.filename):
+            config_file.save(settings.CONFIG_FILE_PATH)
+            if sasn_cmd_helper.load_apply(settings.CONFIG_FILE_PATH):
+                upload_result = "Success"
+            else:
+                upload_result = 'Load apply failed.'
 
             return render_template('loadandapply.html', upload_result=upload_result)
         else:
@@ -85,31 +111,57 @@ def upload_file():
 
     return render_template('loadandapply.html', error=error)
 
+
+@app.route('/cdrDecoder/', methods=['GET', 'POST'])
+def decode_CDR():
+    if not session.get('logged_in'):
+        abort(401)
+    error = None
+    if request.method == 'POST':
+        config_file = request.files['file']
+        if config_file:
+            config_file.save(settings.CDR_FILE_PATH)
+            result = sasn_cmd_helper.cdrDecode(settings.CDR_FILE_PATH)
+            if result != None:
+                upload_result = "Success"
+            else:
+                upload_result = 'Decode failed'
+
+            return render_template('cdrDecoder.html', upload_result=upload_result,result=result)
+
+
+    return render_template('cdrDecoder.html', error=error)
+
+
+
 @app.route('/showstatus/')
 def show_status():
     # This is just the fake command for test, need update in the final version
-    rel_showstatus = sasn_cmd_helper.exec_cmd_test('ls')
-    #rel_showstatus = sasn_cmd_helper.exec_cmd_test("ns cluster 'ns system show status v' all-appvms")
+    # rel_showstatus = sasn_cmd_helper.exec_cmd_test('ls')
+    if not session.get('logged_in'):
+        abort(401)
+    rel_showstatus = sasn_cmd_helper.exec_cmd_test("ns cluster 'ns system show status v' all-appvms")
     return render_template('showstatus.html', results=rel_showstatus)
 
 
 @app.route('/showsessions/', methods=['GET', 'POST'])
 def show_session():
-    part_select = None
+    if not session.get('logged_in'):
+        abort(401)
     if request.method == 'GET':
-        global rel_showpart
         # This is just the fake command for test, need update in the final version
-        rel_showpart = sasn_cmd_helper.exec_cmd_test('ls')
-        return render_template('showsessions.html', results_showpart=rel_showpart)
+        session['rel_showpart'] = sasn_cmd_helper.exec_cmd_test('ls')
+        return render_template('showsessions.html', results_showpart=session['rel_showpart'])
 
     if request.method == 'POST':
         part_select = request.form['partition']
         cmd = " ".join(['ns part set', part_select])
         show_cmd = ";".join([cmd, 'ns config scm plugin relay show session all'])
         rel_showsession = sasn_cmd_helper.exec_cmd_test(show_cmd)
-        return render_template('showsessions.html', results_showpart=rel_showpart, results_showsess=rel_showsession)
+        return render_template('showsessions.html', results_showpart=session['rel_showpart'],
+                               results_showsess=rel_showsession)
 
 
 if __name__ == '__main__':
-     
+
     app.run(debug=True)
