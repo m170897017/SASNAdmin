@@ -5,6 +5,7 @@ __author__ = 'eccglln'
 import os
 import time
 import paramiko
+from time import sleep
 from jinja2 import Environment, FileSystemLoader
 
 import settings
@@ -144,10 +145,16 @@ class SASNCMDHelper(object):
     def rsa_key_trans(self):
         print "start trans key to RP"
         rsa_trans_script = self.__render_template('RSAKeyTrans', ip=settings.RP1_IP)
+        rsa_gen_script = self.__render_template("GenerateKeys")
         sftp_con = self.test.open_sftp()
+        sftp_con.put(rsa_gen_script, '/tmp/GenerateKeys')
         sftp_con.put(rsa_trans_script, '/tmp/RSAKeyTran')
         sftp_con.close()
+        self.test.exec_command('chmod 744 /tmp/GenerateKeys')
         self.test.exec_command('chmod 744 /tmp/RSAKeyTran')
+        stdin, stdout, stderr = self.test.exec_command('/tmp/GenerateKeys')
+        print 'stdout is: ', stdout.readlines()
+        sleep (2)
         stdin, stdout, stderr = self.test.exec_command('/tmp/RSAKeyTran')
         print 'stdout is: ', stdout.readlines()
 
