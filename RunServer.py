@@ -61,6 +61,7 @@ def page_need_authorization():
 @app.route('/', methods=['GET', 'POST'])
 def login():
     error = None
+
     if request.method == 'POST':
         if request.form['username'] != settings.RP_USERNAME or request.form['password'] != settings.RP_PASSWORD:
             error = 'Invalid credential'
