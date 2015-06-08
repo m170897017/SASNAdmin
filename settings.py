@@ -24,4 +24,6 @@ TEM_LOAD_APPLY = 'templates/loadApply'
 ALLOWED_EXTENSIONS = ['wzd', 'cfg', 'conf']
 MAX_CONTENT_LENGTH = 160 * 1024 * 1024
 
+#cdr parameters
 
+CDR_FILE_PATH = "temp/cdrfile"

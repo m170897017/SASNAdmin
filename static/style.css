@@ -23,6 +23,7 @@ img {
     border-color: #ffffff;
 }
 
+
 a:hover {
 	font-weight: bold;
 }
@@ -133,4 +134,6 @@ a:visited{
 .success{
     font-family: 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
     color: green;
+    font-size: smaller;
+
 }

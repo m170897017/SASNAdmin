@@ -33,6 +33,7 @@ class SASNCMDHelper(object):
         self.rp.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.rp.connect(settings.RP_IP, username=settings.RP_USERNAME, password=settings.RP_PASSWORD)
 
+
     def init_ssh_for_test(self):
         '''
         Creating connection towards host.
@@ -41,6 +42,7 @@ class SASNCMDHelper(object):
         self.test = paramiko.SSHClient()
         self.test.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.test.connect(hostname=settings.HOST_IP, username=settings.HOST_USERNAME, password=settings.HOST_PASSWORD)
+
 
     def exec_cmd(self, cmd):
         '''
@@ -138,6 +140,37 @@ class SASNCMDHelper(object):
             retry_time -= 1
             time.sleep(5)
         return False
+
+    def rsa_key_trans(self):
+        print "start trans key to RP"
+        rsa_trans_script = self.__render_template('RSAKeyTrans', ip=settings.RP1_IP)
+        sftp_con = self.test.open_sftp()
+        sftp_con.put(rsa_trans_script, '/tmp/RSAKeyTran')
+        sftp_con.close()
+        self.test.exec_command('chmod 744 /tmp/RSAKeyTran')
+        stdin, stdout, stderr = self.test.exec_command('/tmp/RSAKeyTran')
+        print 'stdout is: ', stdout.readlines()
+
+    def cdrDecode(self, config_file):
+        '''
+        Upload config file to RP and decode cdr file.
+        :param config_file: path of uploaded cdr file.
+
+        '''
+
+        # put config file onto host using sftp
+        sftp_con = self.test.open_sftp()
+        result = sftp_con.put('static/asn1decoder', '/tmp/asn1decoder')
+        print "trans decoder", result
+        result = sftp_con.put(config_file, '/tmp/cdrfile')
+        print "trans cdrfile", result
+
+        sftp_con.close()
+        self.test.exec_command('chmod 744 /tmp/asn1decoder')
+        self.test.exec_command('/tmp/asn1decoder /tmp/cdrfile')
+        stdin, stdout, stderr = self.test.exec_command('cat --number /tmp/cdrfile.txt')
+        return stdout.readlines()
+
 
     def __render_template(self, template_name, **kargs):
         '''
