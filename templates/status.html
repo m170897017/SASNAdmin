@@ -4,39 +4,43 @@
 
 
 {% block content %}
-    {% if sasn_software_info %}
-        {% for num in range(0, sasn_info_num, 3) %}
-            <HR style="FILTER: progid:DXImageTransform.Microsoft.Shadow(color:#987cb9,direction:145,strength:15)" width="100%" color=#987cb9 SIZE=1>
-            <p><b>SASNvm{{ num//3 }}</b></p>
+    {% if error %}
+        {{ error }}
+    {% else %}
+        {% if sasn_software_info %}
+            {% for num in range(0, sasn_info_num, 3) %}
+                <HR style="FILTER: progid:DXImageTransform.Microsoft.Shadow(color:#987cb9,direction:145,strength:15)" width="100%" color=#987cb9 SIZE=1>
+                <p><b>SASNvm{{ num//3 }}</b></p>
 
-            <table width="100%">
-                <tr>
-                    <td><b>&nbsp;&nbsp;Heuristics:</b></td>
-                    <td>&nbsp;</td>
-
-                </tr>
-                <tr>
-                    <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Release:</td>
-                    <td>{{ sasn_software_info[num] }}</td>
-
-                </tr>
-                <tr>
-                    <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Installed:</td>
-                    <td>{{ sasn_software_info[num+1] }}</td>
-
-                </tr>
+                <table width="100%">
                     <tr>
-                    <td><b>&nbsp;&nbsp;sasn_vpf:</b></td>
-                    <td>&nbsp;</td>
+                        <td><b>&nbsp;&nbsp;Heuristics:</b></td>
+                        <td>&nbsp;</td>
 
-                </tr>
-                <tr>
-                    <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Release:</td>
-                    <td>{{ sasn_software_info[num+2] }}</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Release:</td>
+                        <td>{{ sasn_software_info[num] }}</td>
 
-                </tr>
-            </table>
-        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Installed:</td>
+                        <td>{{ sasn_software_info[num+1] }}</td>
+
+                    </tr>
+                        <tr>
+                        <td><b>&nbsp;&nbsp;sasn_vpf:</b></td>
+                        <td>&nbsp;</td>
+
+                    </tr>
+                    <tr>
+                        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Release:</td>
+                        <td>{{ sasn_software_info[num+2] }}</td>
+
+                    </tr>
+                </table>
+            {% endfor %}
+        {% endif %}
     {% endif %}
 {% endblock %}
 

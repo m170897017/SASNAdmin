@@ -20,6 +20,7 @@ class SASNCMDHelper(object):
     def __init__(self):
         self.rp = None
         self.test = None
+        self.rsa_key_trans_done = None
 
     def __del__(self):
         # self.rp.close()
@@ -116,10 +117,9 @@ class SASNCMDHelper(object):
 
         # generate load apply script
         load_apply_script_on_host = '/tmp/loadApply'
-        config_file_on_rp = '/tmp/config.com'
-        load_apply_command = 'configure /tmp/loadApply single-app-commit'
-        load_apply_script = self.__render_template('loadApply', local_file_path=load_apply_script_on_host,
-                                                   ip=settings.RP1_IP, command=load_apply_command,
+        config_file_on_host = config_file_on_rp = '/tmp/config.com'
+        load_apply_script = self.__render_template('loadApply', config_file_on_host=config_file_on_host,
+                                                   ip=settings.RP1_IP,
                                                    config_file_on_rp=config_file_on_rp)
 
         # put config file onto server using sftp
@@ -140,6 +140,10 @@ class SASNCMDHelper(object):
 
     def rsa_key_trans(self):
         print "start trans key to RP"
+        self.rsa_key_trans_done = False
+
+
+
         rsa_trans_script = self.__render_template('RSAKeyTrans', ip=settings.RP1_IP)
         rsa_gen_script = self.__render_template("GenerateKeys")
 
@@ -152,6 +156,7 @@ class SASNCMDHelper(object):
         sleep(2)
         stdin, stdout, stderr = self.test.exec_command('/tmp/RSAKeyTran')
         print 'stdout is: ', stdout.readlines()
+        self.rsa_key_trans_done = True
 
     def cdrDecode(self, config_file):
         '''
@@ -161,14 +166,25 @@ class SASNCMDHelper(object):
         '''
 
         self.__upload_to_host('static/asn1decoder', '/tmp/asn1decoder')
-        print "trans decoder", result
         self.__upload_to_host(config_file, '/tmp/cdrfile')
-        print "trans cdrfile", result
 
         self.test.exec_command('chmod 744 /tmp/asn1decoder')
         self.test.exec_command('/tmp/asn1decoder /tmp/cdrfile')
         stdin, stdout, stderr = self.test.exec_command('cat --number /tmp/cdrfile.txt')
         return stdout.readlines()
+
+    def check_ssh_key_ok(self):
+        """
+        Wait some time for ssh key trans.
+        :return: True if ssh key trans is done or False
+        """
+        retry_wait_time = [1, 2, 3, 4, 5, 6]
+        for wait_time in retry_wait_time:
+            print 'now wait:', wait_time
+            if self.rsa_key_trans_done:
+                return True
+            time.sleep(wait_time)
+        return False
 
 
     def __if_commit_done(self):
@@ -216,7 +232,6 @@ class SASNCMDHelper(object):
 
 
 if __name__ == '__main__':
-
     # ssh = paramiko.SSHClient()
     # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     # ssh.connect('10.65.100.22', username='root', password='rootroot')

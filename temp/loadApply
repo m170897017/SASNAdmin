@@ -1,5 +1,5 @@
 #!/usr/bin/expect -f
-spawn scp /tmp/loadApply root@11.11.20.15:/tmp/config.com
+spawn scp /tmp/config.com root@11.11.20.15:/tmp/config.com
 # expect "*password"
 # send "root\r"
 set timeout 10
@@ -11,6 +11,6 @@ send "en\r"
 expect "Password:"
 send "test\r"
 expect "*Redback"
-send "configure /tmp/loadApply single-app-commit\r"
+send "configure /tmp/config.com single-app-commit\r"
 expect "*Redback"
 send "exit\r"

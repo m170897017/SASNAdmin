@@ -1,5 +1,5 @@
 #!/usr/bin/expect -f
-spawn scp {{ local_file_path }} root@{{ ip }}:{{ config_file_on_rp }}
+spawn scp {{ config_file_on_host }} root@{{ ip }}:{{ config_file_on_rp }}
 # expect "*password"
 # send "root\r"
 set timeout 10
@@ -11,6 +11,6 @@ send "en\r"
 expect "Password:"
 send "test\r"
 expect "*Redback"
-send "{{ command }}\r"
+send "configure {{ config_file_on_rp }} single-app-commit\r"
 expect "*Redback"
 send "exit\r"

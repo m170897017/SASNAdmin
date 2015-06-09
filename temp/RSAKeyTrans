@@ -8,15 +8,15 @@ expect {
     expect {
        "*password" {
         send "root\r"
-        sleep 5
+        sleep 2
           }
         }
      }
 "*password" {
      send "root\r"
-     sleep 5
+     sleep 2
      }
-"id_dsa.pub" {
+"id_rsa.pub" {
     sleep 1
     }
 }

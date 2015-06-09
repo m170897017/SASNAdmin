@@ -5,6 +5,8 @@ Created on Nov 20, 2014
 
 @author: eccglln
 """
+import time
+import threading
 
 from flask import Flask, render_template, request, redirect, url_for, session, abort
 
@@ -42,12 +44,18 @@ def search():
 def home():
     if not session.get('logged_in'):
         abort(401)
-    # get latest sasn status every time
-    session['sasn_status'] = sasn_cmd_helper.get_software_information()
-    # since we only get three kinds of info for sasn vms, we divide it by 3 in html file
-    session['sasn_info_num'] = len(session['sasn_status'])
-    return render_template('status.html', sasn_software_info=session['sasn_status'],
-                           sasn_info_num=session['sasn_info_num'])
+
+    # check if connection is OK now
+    if sasn_cmd_helper.check_ssh_key_ok():
+        print 'trans is ok now', time.time()
+        # get latest sasn status every time
+        session['sasn_status'] = sasn_cmd_helper.get_software_information()
+        # since we only get three kinds of info for sasn vms, we divide it by 3 in html file
+        session['sasn_info_num'] = len(session['sasn_status'])
+        return render_template('status.html', sasn_software_info=session['sasn_status'],
+                               sasn_info_num=session['sasn_info_num'])
+    else:
+        return render_template('status.html', error='There is something with ssh key between RP and Host, please check!')
 
 
 @app.errorhandler(401)
@@ -59,28 +67,39 @@ def page_need_authorization():
 def login():
     error = None
 
+    if request.method == 'GET':
+        # Let's do log in before authentication to speed up log in
+        # create a ssh connection to RP card
+        global sasn_cmd_helper
+        sasn_cmd_helper = SASNCMDHelper()
+        print 'before init ssh', time.time()
+        sasn_cmd_helper.init_ssh_for_test()
+        print 'after init ssh', time.time()
+
+        # clear console output everytime a user is created
+        session['console_output'] = []
+        session['command_number'] = 0
+        session['logged_in'] = True
+        print 'befor start thread: ', time.time()
+
+
+        rsa_key_trans_thread = threading.Thread(target=sasn_cmd_helper.rsa_key_trans, args=[])
+        rsa_key_trans_thread.start()
+        print 'after start thread:', time.time()
+        # clean temp dictionary according to OS
+        # if os is windows
+        # os.system('rm -r temp/*')
+
+        return render_template('login.html', error=error)
+
+
     if request.method == 'POST':
         if request.form['username'] != settings.RP_USERNAME or request.form['password'] != settings.RP_PASSWORD:
             error = 'Invalid credential'
         else:
-
-            # create a ssh connection to RP card
-            global sasn_cmd_helper
-            sasn_cmd_helper = SASNCMDHelper()
-            sasn_cmd_helper.init_ssh_for_test()
-
-            # clear console output everytime a user is created
-            session['console_output'] = []
-            session['command_number'] = 0
-            session['logged_in'] = True
-            sasn_cmd_helper.rsa_key_trans()
-            # clean temp dictionary according to OS
-            # if os is windows
-            # os.system('rm -r temp/*')
-
             return redirect(url_for('home'))
 
-    return render_template('login.html', error=error)
+
 
 
 @app.route('/logout')
