@@ -123,11 +123,9 @@ class SASNCMDHelper(object):
                                                    config_file_on_rp=config_file_on_rp)
 
         # put config file onto server using sftp
-        with self.test.open_sftp() as sftp_con:
-        # sftp_con = self.test.open_sftp()
-            sftp_con.put(load_apply_script, load_apply_script_on_host)
-            sftp_con.put(config_file, config_file_on_rp)
-        # sftp_con.close()
+        self.__upload_to_host(load_apply_script, load_apply_script_on_host)
+        self.__upload_to_host(config_file, config_file_on_rp)
+
         self.test.exec_command('chmod 744 /tmp/loadApply')
         stdin, stdout, stderr = self.test.exec_command('/tmp/loadApply')
         stdout_info = stdout.readlines()
@@ -139,36 +137,19 @@ class SASNCMDHelper(object):
 
         return self.__if_commit_done()
 
-    def __if_commit_done(self):
-        """
-        Check if there is still commit in progress. Checking for 15s tops.
-        :return: True if there is no commit in progress else False.
-        """
-        retry_time = 3
-        while retry_time > 0:
-            info = self.exec_cmd_test(SASNCommands.SHOW_COMMIT_PROGRESS)
-            print 'if commit done?: ', info
-            if 'No commit in progress' in info:
-            # if 'No commit in progress' in self.exec_cmd_test(SASNCommands.SHOW_COMMIT_PROGRESS):
-                return True
-            retry_time -= 1
-            print 'now we still have to try %d times' % retry_time
-            time.sleep(5)
-        return False
 
     def rsa_key_trans(self):
         print "start trans key to RP"
         rsa_trans_script = self.__render_template('RSAKeyTrans', ip=settings.RP1_IP)
         rsa_gen_script = self.__render_template("GenerateKeys")
-        sftp_con = self.test.open_sftp()
-        sftp_con.put(rsa_gen_script, '/tmp/GenerateKeys')
-        sftp_con.put(rsa_trans_script, '/tmp/RSAKeyTran')
-        sftp_con.close()
+
+        self.__upload_to_host(rsa_gen_script, '/tmp/GenerateKeys')
+        self.__upload_to_host(rsa_trans_script, '/tmp/RSAKeyTran')
         self.test.exec_command('chmod 744 /tmp/GenerateKeys')
         self.test.exec_command('chmod 744 /tmp/RSAKeyTran')
         stdin, stdout, stderr = self.test.exec_command('/tmp/GenerateKeys')
         print 'stdout is: ', stdout.readlines()
-        sleep (2)
+        sleep(2)
         stdin, stdout, stderr = self.test.exec_command('/tmp/RSAKeyTran')
         print 'stdout is: ', stdout.readlines()
 
@@ -179,19 +160,33 @@ class SASNCMDHelper(object):
 
         '''
 
-        # put config file onto host using sftp
-        sftp_con = self.test.open_sftp()
-        result = sftp_con.put('static/asn1decoder', '/tmp/asn1decoder')
+        self.__upload_to_host('static/asn1decoder', '/tmp/asn1decoder')
         print "trans decoder", result
-        result = sftp_con.put(config_file, '/tmp/cdrfile')
+        self.__upload_to_host(config_file, '/tmp/cdrfile')
         print "trans cdrfile", result
 
-        sftp_con.close()
         self.test.exec_command('chmod 744 /tmp/asn1decoder')
         self.test.exec_command('/tmp/asn1decoder /tmp/cdrfile')
         stdin, stdout, stderr = self.test.exec_command('cat --number /tmp/cdrfile.txt')
         return stdout.readlines()
 
+
+    def __if_commit_done(self):
+        """
+        Check if there is still commit in progress. Checking for 15s tops.
+        :return: True if there is no commit in progress else False.
+        """
+        retry_time = 3
+        while retry_time > 0:
+            info = self.exec_cmd_test(SASNCommands.SHOW_COMMIT_PROGRESS)
+            print 'if commit done?: ', info
+            if 'No commit in progress' in info:
+                # if 'No commit in progress' in self.exec_cmd_test(SASNCommands.SHOW_COMMIT_PROGRESS):
+                return True
+            retry_time -= 1
+            print 'now we still have to try %d times' % retry_time
+            time.sleep(5)
+        return False
 
     def __render_template(self, template_name, **kargs):
         """
@@ -208,8 +203,20 @@ class SASNCMDHelper(object):
             f.write(data)
         return target_file
 
+    def __upload_to_host(self, src_file_path, dst_file_path):
+        """
+        Upload specific files from local to host.
+        :param src_file_path: path of source file on local machine
+        :param dst_file_path: path of remote file on host
+        :return: None
+        """
+
+        with self.test.open_sftp() as sftp_con:
+            sftp_con.put(src_file_path, dst_file_path)
+
 
 if __name__ == '__main__':
+
     # ssh = paramiko.SSHClient()
     # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     # ssh.connect('10.65.100.22', username='root', password='rootroot')
