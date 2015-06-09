@@ -17,6 +17,6 @@ expect {
      sleep 2
      }
 "id_rsa.pub" {
-    sleep 1
+    sleep 2
     }
 }

@@ -4,6 +4,7 @@ __author__ = 'eccglln'
 
 import os
 import time
+import socket
 import paramiko
 from time import sleep
 from jinja2 import Environment, FileSystemLoader
@@ -139,6 +140,7 @@ class SASNCMDHelper(object):
 
 
     def rsa_key_trans(self):
+
         print "start trans key to RP"
         self.rsa_key_trans_done = False
 
@@ -157,6 +159,19 @@ class SASNCMDHelper(object):
         stdin, stdout, stderr = self.test.exec_command('/tmp/RSAKeyTran')
         print 'stdout is: ', stdout.readlines()
         self.rsa_key_trans_done = True
+
+    def check_connection(self):
+        print "checking the connections"
+        stdin, stdout, stderr = self.test.exec_command("ssh root@11.11.20.15 ls")
+        print "try to read lines"
+        result = stdout.readlines()
+        resulterror = stderr.readlines()
+        print 'stdout is', result
+        print 'stderr is',resulterror
+        if not result:
+            self.rsa_key_trans()
+        else:
+            print "Success"
 
     def cdrDecode(self, config_file):
         '''

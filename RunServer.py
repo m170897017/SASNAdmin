@@ -82,8 +82,7 @@ def login():
         session['logged_in'] = True
         print 'befor start thread: ', time.time()
 
-
-        rsa_key_trans_thread = threading.Thread(target=sasn_cmd_helper.rsa_key_trans, args=[])
+        rsa_key_trans_thread = threading.Thread(target=sasn_cmd_helper.check_connection, args=[])
         rsa_key_trans_thread.start()
         print 'after start thread:', time.time()
         # clean temp dictionary according to OS
