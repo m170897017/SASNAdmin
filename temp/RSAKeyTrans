@@ -1,0 +1,22 @@
+#!/usr/bin/expect -f
+set timeout 10
+spawn scp /root/.ssh/id_rsa.pub root@11.11.20.15:~/.ssh/authorized_keys
+expect {
+"Are you sure you want to continue connecting" {
+    send "yes\r"
+    sleep 2
+    expect {
+       "*password" {
+        send "root\r"
+        sleep 5
+          }
+        }
+     }
+"*password" {
+     send "root\r"
+     sleep 5
+     }
+"id_dsa.pub" {
+    sleep 1
+    }
+}

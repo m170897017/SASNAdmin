@@ -1,4 +1,527 @@
-fddfdfd
-eee
-ggg
-efef
+
+
+
+
+
+LI-START
+LI-END
+!
+!
+!
+!OAM (IPCLI) configuration
+!
+ManagedElement=1
+  no SasnFunction=1
+  SasnFunction=1
+   Radius=1
+    RadiusClient=10.205.4.7
+     clientSecret="mysecret"
+     radiusClientSignalingMode="INTERCEPTOR"
+    up
+    RadiusClient=10.205.4.8
+     clientSecret="mysecret"
+     radiusClientSignalingMode="INTERCEPTOR"
+    up
+    RadiusClient=10.205.4.9
+     clientSecret="mysecret"
+     radiusClientSignalingMode="INTERCEPTOR"
+    up
+    RadiusClient=10.205.4.10
+     clientSecret="mysecret"
+     radiusClientSignalingMode="INTERCEPTOR"
+    up
+    RadiusClient=10.205.4.11
+     clientSecret="mysecret"
+     radiusClientSignalingMode="INTERCEPTOR"
+    up
+    radiusServerIpAddress=10.229.190.13
+    radiusServerIpAddress=192.168.211.65
+    radiusServerIpAddress=10.229.190.14
+    radiusServerIpAddress=10.229.190.15
+    radiusServerIpAddress=10.229.190.16
+    RadiusBehavior=1
+    radiusInterimBehavior=ACCEPT_ACCOUNTING_INTERIM
+    up
+   up
+
+
+
+
+
+
+
+ Classification=1
+  ContentTypeDefinition=1
+   ContentType="2"
+    contentTypeLabel="icmp2"
+    PatternMapping="1"
+     patternFkId="2"
+     typeOfPattern="ICMP"
+    up
+   up
+   ContentType="3"
+    contentTypeLabel="icmp3"
+    PatternMapping="1"
+     patternFkId="3"
+     typeOfPattern="ICMP"
+    up
+   up
+   ContentType="1"
+    contentTypeLabel="icmp1"
+    PatternMapping="1"
+     patternFkId="1"
+     typeOfPattern="ICMP"
+    up
+   up
+   ContentType="10000"
+    contentTypeLabel="p_def"
+     PatternMapping="1"
+      patternFkId="1"
+      typeOfPattern="DEFAULT"
+     up
+   up
+  up
+  DefaultPatternSet=1
+   DefaultPattern=1
+   up
+  up
+  IcmpPatternSet=1
+    IcmpPattern="2"
+     host="80.67.0.1" 
+     version=4        
+    up        
+    IcmpPattern="3"
+     host="192.168.1.1" 
+     version=4        
+    up        
+    IcmpPattern="1"
+     host="192.168.1.4" 
+     version=4        
+    up        
+  up
+  ServiceSet="1"
+   ContentTypeMapping="1"
+    contentTypeFkId="2"
+   up
+   ContentTypeMapping="2"
+    contentTypeFkId="3"
+   up
+   ContentTypeMapping="3"
+    contentTypeFkId="1"
+   up
+   ContentTypeMapping="4"
+    contentTypeFkId="10000"
+   up
+  up
+ up
+
+ Operation=1
+  up
+ Policy=1
+  PolicyPccRule=1
+    PccRule=31
+      tdfApplicationFkId=3
+      ratingGroup=31
+    up
+    PccRule=30
+      tdfApplicationFkId=3
+      ratingGroup=30
+    up
+    PccRule=20
+      tdfApplicationFkId=2
+      ratingGroup=20
+    up
+    PccRule=21
+      tdfApplicationFkId=2
+      ratingGroup=21
+    up
+    PccRule=0
+      tdfApplicationFkId=10000
+    up
+    PccRule=11
+      tdfApplicationFkId=1
+      ratingGroup=11
+    up
+    PccRule=10
+      tdfApplicationFkId=1
+      ratingGroup=10
+    up
+  up
+  PolicyAccessControl=1
+    PccRuleProfile="3"
+      pccRuleRangeFkId="11"
+      pccRuleRangeFkId="20"
+    up
+    PccRuleProfile="2"
+      pccRuleRangeFkId="10"
+      pccRuleRangeFkId="21"
+    up
+    PccRuleProfile="1"
+      pccRuleRangeFkId="10"
+      pccRuleRangeFkId="20"
+    up
+    PccRuleProfile="default"
+      pccRuleRangeFkId="20"
+    up
+    PccRuleProfile="4"
+      pccRuleRangeFkId="11"
+      pccRuleRangeFkId="21"
+    up
+    PolicyTdfApplicationGxSet="test1GxSet"
+      PolicyTdfApplicationGx=1
+      up
+      PolicyTdfApplicationGx=2
+      up
+      PolicyTdfApplicationGx=3
+      up
+    up
+  up
+  PolicyRuleSpace="test1"
+   retransmitedPacketsReportOn=TRUE
+   redirectConstraintsOneTimeOn=FALSE
+
+
+
+   policyTdfApplicationGxSetFkId ="test1GxSet"
+   PolicyFeatureProfileSelector=pcc_rule
+     PolicyProfileSelector=1
+       policyRuleSetFkId="PRSprof4"
+       profileFkId="4"
+     up
+     PolicyProfileSelector=2
+       policyRuleSetFkId="PRSprof2"
+       profileFkId="2"
+     up
+     PolicyProfileSelector=3
+       policyRuleSetFkId="PRSprof3"
+       profileFkId="3"
+     up
+     PolicyProfileSelector=4
+       policyRuleSetFkId="PRSprof1"
+       profileFkId="1"
+     up
+   up
+  up
+  PolicyUserPackage="1"
+   PolicyUserProfile="ProfileTest1"
+    controlServerGxFkId="GXSRV"
+    ruleSpaceFkId="test1"
+   up                
+   PolicyUserProfile="ProfileTest2"
+    controlServerGxFkId="GXSRV"
+    ruleSpaceFkId="test1"
+   up                
+   PolicyUserProfile="ProfileTest3"
+    controlServerGxFkId="GXSRV"
+    ruleSpaceFkId="test1"
+   up                
+   PolicyUserProfile="ProfileTest4"
+    controlServerGxFkId="GXSRV"
+    ruleSpaceFkId="test1"
+   up                
+   PolicyProfileSelector="1"
+    policyRuleSetFkId="PRSprof4"
+    profileFkId="ProfileTest4"
+    up    
+   PolicyProfileSelector="2"
+    policyRuleSetFkId="PRSprof2"
+    profileFkId="ProfileTest2"
+    up    
+   PolicyProfileSelector="3"
+    policyRuleSetFkId="PRSprof3"
+    profileFkId="ProfileTest3"
+    up    
+   PolicyProfileSelector="4"
+    policyRuleSetFkId="PRSprof1"
+    profileFkId="ProfileTest1"
+    up    
+   up
+  PolicyDefinition=1
+   PolicyCondition="1"
+    conditionAttribute="RADIUS_CALLING_STATION_ID"
+    conditionOperator="IS"
+    conditionValue="*4"
+    conditionValueCaseSensitiveOn=FALSE
+    up
+   PolicyCondition="2"
+    conditionAttribute="RADIUS_CALLING_STATION_ID"
+    conditionOperator="IS"
+    conditionValue="*2"
+    conditionValueCaseSensitiveOn=FALSE
+    up
+   PolicyCondition="3"
+    conditionAttribute="RADIUS_CALLING_STATION_ID"
+    conditionOperator="IS"
+    conditionValue="*3"
+    conditionValueCaseSensitiveOn=FALSE
+    up
+   PolicyCondition="4"
+    conditionAttribute="RADIUS_CALLING_STATION_ID"
+    conditionOperator="IS"
+    conditionValue="*1"
+    conditionValueCaseSensitiveOn=FALSE
+    up
+   PolicyRule="1"
+    conditionRangeFkId="1"
+    up
+   PolicyRule="2"
+    conditionRangeFkId="2"
+    up
+   PolicyRule="3"
+    conditionRangeFkId="3"
+    up
+   PolicyRule="4"
+    conditionRangeFkId="4"
+    up
+   PolicyRuleSet="PRSprof4"
+    ruleRangeFkId="1"
+    up
+   PolicyRuleSet="PRSprof2"
+    ruleRangeFkId="2"
+    up
+   PolicyRuleSet="PRSprof3"
+    ruleRangeFkId="3"
+    up
+   PolicyRuleSet="PRSprof1"
+    ruleRangeFkId="4"
+    up
+   up
+
+  PolicyServiceEnforcement="1"
+    PolicyAggregatedRgEnforcement="1"
+      aggreRgContentTypeRangeFkId="2"
+      aggreRgContentTypeRangeFkId="1"
+    up
+  up
+
+
+ up
+
+
+
+
+
+
+
+ Server=1
+  ControlServerGx="GXSRV"
+   attrRetrEqRefreshInterval=0
+   allowAclUnspecifiedOn=FALSE
+   primaryIpAddress="3.3.3.101"
+   primaryPort=3868
+   realm="ericsson.com"
+   productName="SASN"
+   timeoutWatchdog=10
+   txTimeout=10
+   supportedFeature="REL9"
+   ControlServerGxEricsson=1
+    oneTimeRedirectOn=FALSE
+    reportingOn=FALSE
+    ruleSpaceSuggestionOn=TRUE
+    up
+   up   
+  ControlServerGy="GYSRV"
+   contextId="6.32251@3gpp.org"
+   primaryIpAddress="3.3.3.100"
+   primaryPort=3869
+   realm="ericsson.com"
+   productName="SASN"
+   timeoutWatchdog=10
+   txTimeout=10
+    reestablishmentFkId="3"
+   ControlServerErrorHandling="continue"
+    code="CODE_5012_DIAMETER_UNABLE_TO_COMPLY"
+    up
+   ControlServerErrorHandling="reestablishment"
+    code="CODE_3004_DIAMETER_TOO_BUSY"
+    up
+   up
+  ControlServerGy="GYSRV2"
+   contextId="6.32251@3gpp.org"
+   primaryIpAddress="3.3.3.102"
+   primaryPort=3870
+   realm="ericsson.com"
+   productName="SASN"
+   timeoutWatchdog=15
+   txTimeout=15
+   ControlServerErrorHandling="continue"
+    code="CODE_5012_DIAMETER_UNABLE_TO_COMPLY"
+    up
+   ControlServerErrorHandling="continue"
+    code="CODE_3004_DIAMETER_TOO_BUSY"
+    up
+   up
+  Reestablishment="3"
+   continueAfterTimeoutOn=FALSE
+   interval=60
+   timeout=0
+   up
+  up
+
+ CreditControl=1
+  CreditRatingGroupControl="20"
+   controlServerGyFkId="GYSRV"
+   creditControlGyFkId="20"
+   quotaReport="SERVICE_ID"
+   creditControlGzFkId="20"
+   ratingGroupRange="20"
+    CreditRgRequestedUnits="1"
+     requestedUnits=3600
+    up
+  up
+  CreditRatingGroupControl="21"
+   controlServerGyFkId="GYSRV2"
+   creditControlGyFkId="21"
+   quotaReport="SERVICE_ID"
+   creditControlGzFkId="21"
+   ratingGroupRange="21"
+    CreditRgRequestedUnits="1"
+     requestedUnits=1000
+    up
+  up
+  CreditRatingGroupControl="31"
+   controlServerGyFkId="GYSRV2"
+   creditControlGyFkId="31"
+   quotaReport="SERVICE_ID"
+   creditControlGzFkId="31"
+   ratingGroupRange="31"
+    CreditRgRequestedUnits="1"
+     requestedUnits=1000
+    up
+  up
+  CreditRatingGroupControl="30"
+   controlServerGyFkId="GYSRV"
+   creditControlGyFkId="30"
+   quotaReport="SERVICE_ID"
+   creditControlGzFkId="30"
+   ratingGroupRange="30"
+    CreditRgRequestedUnits="1"
+     requestedUnits=3600
+    up
+  up
+  CreditRatingGroupControl="11"
+   controlServerGyFkId="GYSRV2"
+   creditControlGyFkId="11"
+   quotaReport="SERVICE_ID"
+   creditControlGzFkId="11"
+   ratingGroupRange="11"
+    CreditRgRequestedUnits="1"
+     requestedUnits=1000
+    up
+  up
+  CreditRatingGroupControl="10"
+   controlServerGyFkId="GYSRV"
+   creditControlGyFkId="10"
+   quotaReport="SERVICE_ID"
+   creditControlGzFkId="10"
+   ratingGroupRange="10"
+    CreditRgRequestedUnits="1"
+     requestedUnits=3600
+    up
+  up
+  CreditControlGy="20"
+   unitType="TIME"
+
+  up
+  CreditControlGz="20"
+  udrTypeFkId="UDRFW"
+  up
+  CreditControlGy="21"
+   unitType="VOLUME"
+
+  up
+  CreditControlGz="21"
+  udrTypeFkId="UDRPGW"
+  up
+  CreditControlGy="31"
+   unitType="VOLUME"
+
+  up
+  CreditControlGz="31"
+  udrTypeFkId="UDRPGW"
+  up
+  CreditControlGy="30"
+   unitType="TIME"
+
+  up
+  CreditControlGz="30"
+  udrTypeFkId="UDRFW"
+  up
+  CreditControlGy="11"
+   unitType="VOLUME"
+
+  up
+  CreditControlGz="11"
+  udrTypeFkId="UDRPGW"
+  up
+  CreditControlGy="10"
+   unitType="TIME"
+
+  up
+  CreditControlGz="10"
+  udrTypeFkId="UDRFW"
+  up
+ up
+ UsageRecord=1
+  CdrStandard=UDRPGW
+   fileRotationInterval=1000
+   format="PGW_CDR"
+   reportingOn=FALSE
+  up
+  CdrCustom=UDRFW
+   fileRotationInterval=1000
+   format="FIXED_WIDTH"
+   reportingOn=FALSE
+   CdrField="1"
+    parameter=RADIUS_CALLING_STATION_ID
+    formatString="%-16.16s"
+   up 
+   CdrField="2"
+    parameter=UDR_RATING_GROUP
+    formatString="%-12u"
+   up 
+   CdrField="3"
+    parameter=UDR_CAUSE_FOR_REC_CLOSING
+    formatString="%-12u"
+   up 
+   CdrField="4"
+    parameter=UDR_DATA_PACKET_UPLINK
+    formatString="%10u"
+   up 
+   CdrField="5"
+    parameter=UDR_DATA_PACKET_DOWNLINK
+    formatString="%10u"
+   up 
+   CdrField="6"
+    parameter=UDR_DATA_VOL_UPLINK
+    formatString="%10u"
+   up 
+   CdrField="7"
+    parameter=UDR_DATA_VOL_DOWNLINK
+    formatString="%10u"
+   up 
+   CdrField="8"
+    parameter=UDR_DURATION
+    formatString="%-12u"
+   up 
+   CdrField="9"
+    parameter=BEARER_USER_POLICY_PROFILE
+    formatString="%-16.16s"
+   up 
+   CdrField="10"
+    parameter=BEARER_RULE_SPACE
+    formatString="%-16.16s"
+   up 
+  up
+ up
+
+ Qos=1
+ up
+
+
+
+
+end
+exit
+!
+!

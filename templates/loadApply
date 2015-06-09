@@ -1,5 +1,5 @@
 #!/usr/bin/expect -f
-spawn scp {{ local_file_path }} root@{{ ip }}
+spawn scp {{ local_file_path }} root@{{ ip }}:{{ config_file_on_rp }}
 # expect "*password"
 # send "root\r"
 set timeout 10
