@@ -1,0 +1,25 @@
+#!/usr/bin/expect -f
+set timeout 10
+spawn ssh-keygen -t rsa
+expect {
+"Enter file in which to save the key" {
+    send "\r"
+    sleep 2
+     expect {
+      "Overwrite" {
+         send "n\r"
+         sleep 2
+      }
+      "Enter passphrase" {
+           send "\r"
+           sleep 2
+           expect {
+           "Enter same passphrase again" {
+           send "\r"
+           sleep 2
+           }
+         }
+       }
+     }
+   }
+}
