@@ -113,7 +113,7 @@ class SASNCMDHelper(object):
         """
         Upload config file to RP and load apply.
         :param config_file: path of config file.
-        :return: True if load apply successfully or False
+        :return: A list of info about load apply result
         """
 
         # generate load apply script
@@ -130,13 +130,12 @@ class SASNCMDHelper(object):
         self.test.exec_command('chmod 744 /tmp/loadApply')
         stdin, stdout, stderr = self.test.exec_command('/tmp/loadApply')
         stdout_info = stdout.readlines()
-        if stdout_info:
-            print 'loadapply stdout:', stdout_info
-        stderr_info = stderr.readlines()
-        if stderr_info:
-            print 'loadapply stderr:', stderr_info
 
-        return self.__if_commit_done()
+        self.__wait_until_commit_done()
+
+        return stdout_info[[index for index, val in enumerate(stdout_info) if val.startswith('.')][0]:-1] \
+            if any([i.find('ERROR') != -1 for i in stdout_info]) else ['Configuration complete!']
+
 
 
     def rsa_key_trans(self):
@@ -161,6 +160,9 @@ class SASNCMDHelper(object):
         self.rsa_key_trans_done = True
 
     def check_connection(self):
+
+        self.rsa_key_trans_done = False
+
         print "checking the connections"
         stdin, stdout, stderr = self.test.exec_command("ssh root@11.11.20.15 ls")
         print "try to read lines"
@@ -171,7 +173,7 @@ class SASNCMDHelper(object):
         if not result:
             self.rsa_key_trans()
         else:
-            print "Success"
+            self.rsa_key_trans_done = True
 
     def cdrDecode(self, config_file):
         '''
@@ -202,22 +204,19 @@ class SASNCMDHelper(object):
         return False
 
 
-    def __if_commit_done(self):
+    def __wait_until_commit_done(self):
         """
         Check if there is still commit in progress. Checking for 15s tops.
-        :return: True if there is no commit in progress else False.
+        :return: None
         """
         retry_time = 3
         while retry_time > 0:
             info = self.exec_cmd_test(SASNCommands.SHOW_COMMIT_PROGRESS)
-            print 'if commit done?: ', info
-            if 'No commit in progress' in info:
-                # if 'No commit in progress' in self.exec_cmd_test(SASNCommands.SHOW_COMMIT_PROGRESS):
-                return True
+            if info and 'No commit in progress' in info[0]:
+                return None
             retry_time -= 1
-            print 'now we still have to try %d times' % retry_time
             time.sleep(5)
-        return False
+
 
     def __render_template(self, template_name, **kargs):
         """

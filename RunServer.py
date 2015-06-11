@@ -49,7 +49,9 @@ def home():
     if sasn_cmd_helper.check_ssh_key_ok():
         print 'trans is ok now', time.time()
         # get latest sasn status every time
+        print 'start to print soft info!!!', time.time()
         session['sasn_status'] = sasn_cmd_helper.get_software_information()
+        print 'finish print soft info!!!', time.time()
         # since we only get three kinds of info for sasn vms, we divide it by 3 in html file
         session['sasn_info_num'] = len(session['sasn_status'])
         return render_template('status.html', sasn_software_info=session['sasn_status'],
@@ -111,21 +113,16 @@ def logout():
 def upload_file():
     if not session.get('logged_in'):
         abort(401)
-    error = None
+    upload_result = None
     if request.method == 'POST':
         config_file = request.files['file']
         if config_file and allowed_file(config_file.filename):
             config_file.save(settings.CONFIG_FILE_PATH)
-            if sasn_cmd_helper.load_apply(settings.CONFIG_FILE_PATH):
-                upload_result = "Success"
-            else:
-                upload_result = 'Load apply failed! Please load apply again!'
-
-            return render_template('loadandapply.html', upload_result=upload_result)
+            upload_result = sasn_cmd_helper.load_apply(settings.CONFIG_FILE_PATH)
         else:
-            error = 'Invalid extension of file, should end with wzd, cfg or conf'
+            upload_result = ['Invalid extension of file, should end with wzd, cfg or conf']
 
-    return render_template('loadandapply.html', error=error)
+    return render_template('loadandapply.html', upload_result=upload_result)
 
 
 @app.route('/cdrDecoder/', methods=['GET', 'POST'])

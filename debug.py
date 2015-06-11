@@ -3,13 +3,17 @@
 
 import threading
 
-x = 0
+a = 1
 
-for i in range(10):
-    if i == 1:
-        print x
-        x += 1
-    if i > 1:
-        print x
+def func_in_thread():
+    print 'now in thread!!!'
+    print a
+    a = 2
+    print a
 
-print 'end', x
+t = threading.Thread(target=func_in_thread, args=[])
+t.start()
+t.join()
+
+
+print 'now  print a', a

@@ -14,8 +14,8 @@ RP_NSSH = '/opt/disk/service-pools/sasnpool/active/bin/nssh -c'
 TEST_NSSH = 'ssh root@11.11.20.15 /opt/disk/service-pools/sasnpool/active/bin/nssh -c \\\"%s\\\"'
 
 RP1_IP = '11.11.20.15'  # vm2
-HOST_IP = '10.65.100.22'
-#HOST_IP = '10.42.92.176'  # netrax3-2-95
+# HOST_IP = '10.65.100.22'
+HOST_IP = '10.42.92.176'  # netrax3-2-95
 HOST_USERNAME = 'root'
 HOST_PASSWORD = 'rootroot'
 
