@@ -4,7 +4,8 @@ __author__ = 'eccglln'
 
 import os
 import time
-import socket
+import logging
+from logging import Formatter, FileHandler
 import paramiko
 from time import sleep
 from jinja2 import Environment, FileSystemLoader
@@ -22,6 +23,11 @@ class SASNCMDHelper(object):
         self.rp = None
         self.test = None
         self.rsa_key_trans_done = None
+        logging.basicConfig(filename='SASNAdmin.log', format=
+        '%(asctime)s %(levelname)s: %(message)s '
+        '[in %(pathname)s:%(lineno)d]',level=logging.INFO)
+
+
 
     def __del__(self):
         # self.rp.close()
@@ -140,11 +146,8 @@ class SASNCMDHelper(object):
 
     def rsa_key_trans(self):
 
-        print "start trans key to RP"
+        logging.info('start trans key to RP')
         self.rsa_key_trans_done = False
-
-
-
         rsa_trans_script = self.__render_template('RSAKeyTrans', ip=settings.RP1_IP)
         rsa_gen_script = self.__render_template("GenerateKeys")
 
@@ -153,23 +156,23 @@ class SASNCMDHelper(object):
         self.test.exec_command('chmod 744 /tmp/GenerateKeys')
         self.test.exec_command('chmod 744 /tmp/RSAKeyTran')
         stdin, stdout, stderr = self.test.exec_command('/tmp/GenerateKeys')
-        print 'stdout is: ', stdout.readlines()
+        logging.info('stdout is: %s ', stdout.readlines())
         sleep(2)
         stdin, stdout, stderr = self.test.exec_command('/tmp/RSAKeyTran')
-        print 'stdout is: ', stdout.readlines()
+        logging.info('stdout is: %s ', stdout.readlines())
         self.rsa_key_trans_done = True
 
     def check_connection(self):
 
         self.rsa_key_trans_done = False
 
-        print "checking the connections"
+        logging.info('checking the connections')
         stdin, stdout, stderr = self.test.exec_command("ssh root@11.11.20.15 ls")
-        print "try to read lines"
+        logging.info('try to read lines')
         result = stdout.readlines()
         resulterror = stderr.readlines()
-        print 'stdout is', result
-        print 'stderr is',resulterror
+        logging.info( 'stdout is %s', result)
+        logging.info( 'stderr is %s', resulterror)
         if not result:
             self.rsa_key_trans()
         else:
@@ -197,7 +200,7 @@ class SASNCMDHelper(object):
         """
         retry_wait_time = [1, 2, 3, 4, 5, 6]
         for wait_time in retry_wait_time:
-            print 'now wait:', wait_time
+            logging.info('now wait: %s', wait_time)
             if self.rsa_key_trans_done:
                 return True
             time.sleep(wait_time)

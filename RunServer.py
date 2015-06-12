@@ -7,6 +7,8 @@ Created on Nov 20, 2014
 """
 import time
 import threading
+import logging
+from logging import Formatter, FileHandler
 
 from flask import Flask, render_template, request, redirect, url_for, session, abort
 
@@ -17,6 +19,7 @@ app = Flask(__name__)
 
 app.config['MAX_CONTENT_LENGTH'] = settings.MAX_CONTENT_LENGTH
 app.config['SECRET_KEY'] = 'development key'
+
 
 
 def allowed_file(filename):
@@ -42,16 +45,17 @@ def search():
 
 @app.route('/home/')
 def home():
+    app.logger.info("in home")
     if not session.get('logged_in'):
         abort(401)
 
     # check if connection is OK now
     if sasn_cmd_helper.check_ssh_key_ok():
-        print 'trans is ok now', time.time()
+        app.logger.info('trans is ok now %s', time.time())
         # get latest sasn status every time
-        print 'start to print soft info!!!', time.time()
+        app.logger.info( 'start to print soft info!!! %s', time.time())
         session['sasn_status'] = sasn_cmd_helper.get_software_information()
-        print 'finish print soft info!!!', time.time()
+        app.logger.info( 'finish print soft info!!! %s', time.time())
         # since we only get three kinds of info for sasn vms, we divide it by 3 in html file
         session['sasn_info_num'] = len(session['sasn_status'])
         return render_template('status.html', sasn_software_info=session['sasn_status'],
@@ -68,25 +72,26 @@ def page_need_authorization():
 @app.route('/', methods=['GET', 'POST'])
 def login():
     error = None
-
+    app.logger.info("======================In login====================================")
     if request.method == 'GET':
         # Let's do log in before authentication to speed up log in
         # create a ssh connection to RP card
         global sasn_cmd_helper
         sasn_cmd_helper = SASNCMDHelper()
-        print 'before init ssh', time.time()
+        app.logger.info('before init ssh %s ', time.time())
+
         sasn_cmd_helper.init_ssh_for_test()
-        print 'after init ssh', time.time()
+        app.logger.info('after init ssh %s', time.time())
 
         # clear console output everytime a user is created
         session['console_output'] = []
         session['command_number'] = 0
         session['logged_in'] = True
-        print 'befor start thread: ', time.time()
+        app.logger.info('before start thread: %s', time.time())
 
         rsa_key_trans_thread = threading.Thread(target=sasn_cmd_helper.check_connection, args=[])
         rsa_key_trans_thread.start()
-        print 'after start thread:', time.time()
+        app.logger.info('after start thread: %s', time.time())
         # clean temp dictionary according to OS
         # if os is windows
         # os.system('rm -r temp/*')
@@ -105,12 +110,14 @@ def login():
 
 @app.route('/logout')
 def logout():
+    app.logger.info('In log out')
     session.pop('logged_in', None)
     return redirect(url_for('login'))
 
 
 @app.route('/loadandapply/', methods=['GET', 'POST'])
 def upload_file():
+    app.logger.info('In load and apply')
     if not session.get('logged_in'):
         abort(401)
     upload_result = None
@@ -127,6 +134,7 @@ def upload_file():
 
 @app.route('/cdrDecoder/', methods=['GET', 'POST'])
 def decode_CDR():
+    app.logger.info('In cdr decode')
     if not session.get('logged_in'):
         abort(401)
     error = None
@@ -149,6 +157,7 @@ def decode_CDR():
 
 @app.route('/showstatus/')
 def show_status():
+    app.logger.info('In show status')
     # This is just the fake command for test, need update in the final version
     # rel_showstatus = sasn_cmd_helper.exec_cmd_test('ls')
     if not session.get('logged_in'):
@@ -159,6 +168,7 @@ def show_status():
 
 @app.route('/showsessions/', methods=['GET', 'POST'])
 def show_session():
+    app.logger.info('In show session')
     if not session.get('logged_in'):
         abort(401)
     if request.method == 'GET':
@@ -176,4 +186,12 @@ def show_session():
 
 
 if __name__ == '__main__':
+#    logging.basicConfig(filename='SASNAdmin.log', format='%(asctime)s %(message)s', level=logging.DEBUG)
+    file_handler = FileHandler(filename='SASNAdmin.log')
+    file_handler.setFormatter(Formatter(
+    '%(asctime)s %(levelname)s: %(message)s '
+    '[in %(pathname)s:%(lineno)d]'
+    ))
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
     app.run(debug=True)
