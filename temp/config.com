@@ -118,7 +118,7 @@ ManagedElement=1
    primaryPort="3890"
    realm="ericsson.com"
    secondaryPort="3890"
-   txTimeout=10
+   txTimeout=100000000
    sendDestinationHostInitialOn =  FALSE
    originStateIdHandlingOn = FALSE
    up

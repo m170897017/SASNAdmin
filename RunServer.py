@@ -9,9 +9,10 @@ from logging import FileHandler, Formatter, INFO
 import threading
 
 from flask import render_template, request, redirect, url_for, session, abort, Flask
-from CMDHelper import SASNCMDHelper
 
-import settings
+from sasnadmin import settings
+
+from sasnadmin.CMDHelper import SASNCMDHelper
 
 
 

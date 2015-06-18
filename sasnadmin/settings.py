@@ -2,6 +2,8 @@
 # -*- coding:utf-8 -*-
 __author__ = 'eccglln'
 
+import os
+
 RP_IP = '20.1.1.1'
 RP_USERNAME = 'root'
 RP_PASSWORD = 'root'
@@ -31,3 +33,9 @@ MAX_CONTENT_LENGTH = 160 * 1024 * 1024
 # cdr parameters
 
 CDR_FILE_PATH = "temp/cdrfile"
+SASNADMIN_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = os.path.dirname(SASNADMIN_DIR)
+
+# static file path
+PATH_ASN1DECODER = os.path.join(PROJECT_DIR, 'static', 'asn1decoder')
+print PATH_ASN1DECODER

@@ -1,9 +1,9 @@
 #!/usr/bin/expect -f
-spawn scp /tmp/config.com root@11.11.20.15:/tmp/config.com
+spawn scp /tmp/config.com root@11.13.20.15:/tmp/config.com
 # expect "*password"
 # send "root\r"
 set timeout 10
-spawn ssh admin@11.11.20.15
+spawn ssh admin@11.13.20.15
 expect "*password"
 send "admin\r"
 expect "*Redback>"

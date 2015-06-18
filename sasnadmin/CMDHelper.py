@@ -10,7 +10,7 @@ from time import sleep
 import paramiko
 from jinja2 import Environment, FileSystemLoader
 
-import settings
+from sasnadmin import settings
 import SASNCommands
 
 
@@ -200,7 +200,7 @@ class SASNCMDHelper(object):
 
         '''
 
-        self.__upload_to_host('static/asn1decoder', '/tmp/asn1decoder')
+        self.__upload_to_host(settings.PATH_ASN1DECODER, '/tmp/asn1decoder')
         self.__upload_to_host(config_file, '/tmp/cdrfile')
 
         self.test.exec_command('chmod 744 /tmp/asn1decoder')
@@ -242,10 +242,9 @@ class SASNCMDHelper(object):
         :param template_name: Name of template file under templates folder.
         :return: Path of rendered file in temp folder.
         """
-        cwd = os.path.dirname(os.path.abspath(__file__))
+        target_file = os.path.join(settings.PROJECT_DIR, 'temp', template_name)
+        j2_env = Environment(loader=FileSystemLoader(settings.PROJECT_DIR), trim_blocks=True)
         template_file = os.path.join('templates/', template_name)
-        target_file = os.path.join(cwd, 'temp', template_name)
-        j2_env = Environment(loader=FileSystemLoader(cwd), trim_blocks=True)
         data = j2_env.get_template(template_file).render(**kargs)
         with open(target_file, 'wb') as f:
             f.write(data)
@@ -271,7 +270,10 @@ if __name__ == '__main__':
     # print stdout.readlines()
     # print stderr.readlines()
 
+    # test for ssh connection
     my_helper = SASNCMDHelper()
     my_helper.init_ssh_for_test()
     print my_helper.get_partition_amount()
     print my_helper.show_scm_sessions('1', 1)
+
+    # test for template render
