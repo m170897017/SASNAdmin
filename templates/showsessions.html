@@ -4,31 +4,31 @@
 
 {% block content %}
 
-    <form name="select_part" method="POST" action="/showsessions/ ">
-        List partitions in SASN:
-        <div class="outputInShowSessions" name="cmd">
-            {% if results_showpart %}
-                {% for res in results_showpart %}
-                    {{ res }}<br>
-                {% endfor %}
-            {% else %}
-                <h3>Can not get partition information!</h3>
-            {% endif %}
-        </div>
-    </form>
 
-    <form name="show_session" method="POST" action="/showsessions/" style="position:relative; top:10px;">
-        Select partition [Input Number]:
-        <input type="text"  name="partition"/>
+    <form name="show_scm_session" method="POST" action="/showsessions/">
+        Show scm sessions on Partition
+        {% if partition_amount %}
+            {% for num in partition_amount %}
+                <select name="partition_num">
+                    <option value="{{ num }}">{{ num }}</option>
+                </select>
+            {% endfor %}
+        {% endif %}
+        on
+            <select name="sasn_role">
+                <option value="1">master</option>
+                <option value="0">backup</option>
+            </select>
+
         <input type="submit" value="Submit"/>
-        <div class="outputInShowSessions">
-            {% if results_showsess %}
-                {% for res in results_showsess %}
-                    {{ res }}<br>
-                {% endfor %}
-            {% endif %}
-        </div>
     </form>
 
+    {% if show_scm_sessions %}
+        <div class="commonOutput">
+            {% for info in show_scm_sessions %}
+                {{ info }}<br>
+            {% endfor %}
+        </div>
+    {% endif %}
 {% endblock %}
 

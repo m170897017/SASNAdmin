@@ -4,10 +4,10 @@ __author__ = 'eccglln'
 
 import os
 import time
-import logging
-from logging import Formatter, FileHandler
-import paramiko
+import re
 from time import sleep
+
+import paramiko
 from jinja2 import Environment, FileSystemLoader
 
 import settings
@@ -23,10 +23,6 @@ class SASNCMDHelper(object):
         self.rp = None
         self.test = None
         self.rsa_key_trans_done = None
-        logging.basicConfig(filename='SASNAdmin.log', format=
-        '%(asctime)s %(levelname)s: %(message)s '
-        '[in %(pathname)s:%(lineno)d]',level=logging.INFO)
-
 
 
     def __del__(self):
@@ -68,6 +64,7 @@ class SASNCMDHelper(object):
         :param cmd: Command to be executed.
         :return: execution results
         """
+        print 'command to execute', self.__cmd_for_test(cmd)
         stdin, stdout, stderr = self.test.exec_command(self.__cmd_for_test(cmd))
         stdout_info = stdout.readlines()
         if stdout_info:
@@ -115,6 +112,21 @@ class SASNCMDHelper(object):
                 soft_info.append(info[2])
         return soft_info
 
+    def get_partition_amount(self):
+        """
+        Get partition amount from all appvms.
+        :return: Partition amount not including partition 0
+        """
+        sasn_partition_info = self.exec_cmd_test(SASNCommands.SHOW_PARTITION_CONFIG)
+        return max([re.search('\d+', i).group() for i in
+                        [info for info in sasn_partition_info if 'ns partition set' in info]])
+
+    def show_scm_sessions(self, partition, sasn_role):
+        return self.exec_cmd_test(SASNCommands.SHOW_SCM_SESSION.format(partition, sasn_role))
+
+    def show_status(self):
+        return self.exec_cmd_test(SASNCommands.SHOW_ALL_STATUS)
+
     def load_apply(self, config_file):
         """
         Upload config file to RP and load apply.
@@ -143,10 +155,9 @@ class SASNCMDHelper(object):
             if any([i.find('ERROR') != -1 for i in stdout_info]) else ['Configuration complete!']
 
 
-
     def rsa_key_trans(self):
 
-        logging.info('start trans key to RP')
+        # app.logger.info('start trans key to RP')
         self.rsa_key_trans_done = False
         rsa_trans_script = self.__render_template('RSAKeyTrans', ip=settings.RP1_IP)
         rsa_gen_script = self.__render_template("GenerateKeys")
@@ -156,26 +167,30 @@ class SASNCMDHelper(object):
         self.test.exec_command('chmod 744 /tmp/GenerateKeys')
         self.test.exec_command('chmod 744 /tmp/RSAKeyTran')
         stdin, stdout, stderr = self.test.exec_command('/tmp/GenerateKeys')
-        logging.info('stdout is: %s ', stdout.readlines())
+        # app.logger.info('stdout is: %s ', stdout.readlines())
         sleep(2)
         stdin, stdout, stderr = self.test.exec_command('/tmp/RSAKeyTran')
-        logging.info('stdout is: %s ', stdout.readlines())
+        # app.logger.info('stdout is: %s ', stdout.readlines())
         self.rsa_key_trans_done = True
 
     def check_connection(self):
 
         self.rsa_key_trans_done = False
 
-        logging.info('checking the connections')
-        stdin, stdout, stderr = self.test.exec_command("ssh root@11.11.20.15 ls")
-        logging.info('try to read lines')
+        # app.logger.info('checking the connections')
+        stdin, stdout, stderr = self.test.exec_command(settings.CHECK_SSH_CMD)
+        # app.logger.info('try to read lines')
         result = stdout.readlines()
         resulterror = stderr.readlines()
-        logging.info( 'stdout is %s', result)
-        logging.info( 'stderr is %s', resulterror)
+        # app.logger.info('stdout is %s', result)
+        # app.logger.info('stderr is %s', resulterror)
+        # wait some time to avoid unstable situation
+        time.sleep(3)
         if not result:
+            print 'need to trans key!!!'
             self.rsa_key_trans()
         else:
+            print 'no need to trans key!!!!'
             self.rsa_key_trans_done = True
 
     def cdrDecode(self, config_file):
@@ -200,7 +215,7 @@ class SASNCMDHelper(object):
         """
         retry_wait_time = [1, 2, 3, 4, 5, 6]
         for wait_time in retry_wait_time:
-            logging.info('now wait: %s', wait_time)
+            # app.logger.info('now wait: %s', wait_time)
             if self.rsa_key_trans_done:
                 return True
             time.sleep(wait_time)
@@ -257,5 +272,6 @@ if __name__ == '__main__':
     # print stderr.readlines()
 
     my_helper = SASNCMDHelper()
-    my_helper.exec_cmd_test('date')
-    # my_helper.exec_cmd("ns cluster 'ns system show status v' all-appvms")
+    my_helper.init_ssh_for_test()
+    print my_helper.get_partition_amount()
+    print my_helper.show_scm_sessions('1', 1)
