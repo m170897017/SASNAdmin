@@ -190,7 +190,13 @@ def show_session():
         return render_template('showsessions.html', partition_amount=session['partition_amount'],
                                show_scm_sessions=show_scm_sessions)
 
+@app.route('/help/', methods=['GET'])
+def help():
+    return render_template('help.html')
 
+@app.route('/contact/', methods=['GET'])
+def contact():
+    return render_template('contact.html')
 
 if __name__ == '__main__':
 
