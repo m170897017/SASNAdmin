@@ -10,49 +10,82 @@
 
 <body class="small login">
 
-	<div id="header">
-		<div class="wrapper">
-            <h1 style="font-size:50px;">SASN Admin</h1>
-		</div>
-	</div>
+<div id="header">
+    <div class="wrapper">
+        <h1 style="font-size:50px;">SASN Admin</h1>
+    </div>
+</div>
 
-    <div id="container">
-    	<div id="content">
-    		<div class="wrapper">
-
-				<form name="Login" method="post" action="">
-				<input type="hidden" value="false" name="returning" id="returning" />
-					<table class="login" style="margin-left: auto; margin-right: auto;">
-						<tr>
-							<td><p class="mtop0 mbottom025"><strong><label for="username">Username</label></strong></p><input id="username" tabindex="1" class="inputtext" type="text" name="username" /></td>
-						</tr>
-						<tr>
-							<td><p class="mtop05 mbottom025"><strong><label for="password">Password</label></strong></p><input id="password" tabindex="2" class="inputtext" type="password" name="password"  /></td>
-						</tr>
-
-                        {% if error %}
-                            <div class="error">
-                            Error: {{ error }}
-                            </div>
-                        {% endif %}
-
-						<tr>
-							<td style="padding-top: 10px;"><input class="public-button" type="submit" tabindex="3" value="Log in" /></td>
-						</tr>
-					</table>
-				</form>
-
-            </div> <!-- wrapper -->
-		</div> <!-- content -->
-	</div> <!-- container -->
-
-    <div id="footer">
+<div id="container">
+    <div id="content">
         <div class="wrapper">
-            <p>
-			<a href="/help/"><span>Help</span></a> <span class="bar">|</span>
-			<a href="/contact/">Contact</a>
-		</p>
-            <p id="copyright">Copyright 2015 by Ericsson. Authors:Stephen Lin, Guoyan Zhang, Congcong Gu, Rainbow Sun. All rights reserved. </p>
+
+            <form name="Login" method="post" action="">
+                <input type="hidden" value="false" name="returning" id="returning"/>
+                <table class="login" style="margin-left: auto; margin-right: auto;">
+                    {% if sasn_vm_number %}
+                    <tr>
+                        <td>
+                            <p class="mtop0 mbottom025"><strong><label for="SASN VM">SASN VM</label></strong>
+
+                                <select name="sasn_vm">
+                                    {% for num in range(1, sasn_vm_number+1) %}
+                                        <option>{{ num }}</option>
+                                    {% endfor %}
+                                </select>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 10px;"><input class="public-button" type="submit" tabindex="1"
+                                                              value="Log In"/></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td><p class="mtop0 mbottom025"><strong><label for="username">Username</label></strong></p>
+                            <input id="username" tabindex="1" class="inputtext" type="text" name="username"/></td>
+                    </tr>
+                    <tr>
+                        <td><p class="mtop05 mbottom025"><strong><label for="password">Password</label></strong></p>
+                            <input id="password" tabindex="2" class="inputtext" type="password" name="password"/></td>
+                    </tr>
+                    <tr>
+                        <td><p class="mtop05 mbottom025"><strong><label for="hostip">Host IP</label></strong></p><input
+                                id="hostip" tabindex="3" class="inputtext" type="text" name="hostip"/></td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 10px;"><input class="public-button" type="submit" tabindex="4"
+                                                              value="Next"/></td>
+                    </tr>
+                    {% endif %}
+                    {% if error %}
+                    <div class="error">
+                        Error: {{ error }}
+                    </div>
+                    {% endif %}
+
+
+                </table>
+            </form>
+
+        </div>
+        <!-- wrapper -->
+    </div>
+    <!-- content -->
+</div>
+<!-- container -->
+
+<div id="footer">
+    <div class="wrapper">
+        <p>
+            <a href="/help/"><span>Help</span></a> <span class="bar">|</span>
+            <a href="/contact/">Contact</a>
+        </p>
+
+        <p id="copyright">Copyright 2015 by Ericsson. Authors:Stephen Lin, Guoyan Zhang, Congcong Gu, Rainbow Sun. All
+            rights reserved. </p>
+    </div>
+</div>
 
 </body>
 

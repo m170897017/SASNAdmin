@@ -1,50 +1,23 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-"""
-Created on Nov 20, 2014
+__author__ = 'eccglln'
 
-@author: eccglln
-"""
-from logging import FileHandler, Formatter, INFO
-import threading
-
-from flask import render_template, request, redirect, url_for, session, abort, Flask
+from flask import Blueprint
+from flask import render_template, request, redirect, url_for, session, abort
 
 from sasnadmin import settings
-
-from sasnadmin.CMDHelper import SASNCMDHelper
-
+from sasnadmin.CMDHelper import sasn_cmd_helper
 
 
-app = Flask('SASNAdmin')
-
-# configure max content length of request content
-app.config['MAX_CONTENT_LENGTH'] = settings.MAX_CONTENT_LENGTH
-app.config['SECRET_KEY'] = 'development key'
-
-# configure app logger
-file_handler = FileHandler(filename='SASNAdmin.log')
-file_handler.setFormatter(Formatter(
-    '%(asctime)s %(levelname)s %(filename)s(line%(lineno)d) in function :%(funcName)s'
-    '\n%(message)s'
-))
-file_handler.setLevel(INFO)
-app.logger.addHandler(file_handler)
-
-# init cmdhelper only for first time
-# initialize SASN CMD helper
-sasn_cmd_helper = SASNCMDHelper()
-sasn_cmd_helper.init_ssh_for_test()
-# put key trans here since we only need to do it once
-rsa_key_trans_thread = threading.Thread(target=sasn_cmd_helper.check_connection, args=[])
-rsa_key_trans_thread.start()
+admin = Blueprint("admin", __name__)
 
 
+def if_ip_valid_for_ipv4(ip):
+    ip = ip.split('.')
+    return len(ip) == 4 and all([len(number) <= 3 and 0 < int(number) < 255 for number in ip])
 
-# initialization
 
-
-@app.route('/my_console/', methods=['GET', 'POST'])
+@admin.route('/my_console/', methods=['GET', 'POST'])
 def search():
     if not session.get('logged_in'):
         abort(401)
@@ -53,20 +26,21 @@ def search():
             ['=' * 40, '\n', 'In[%d]: ' % session['command_number'], '\n', request.form['cmd'], '\n',
              'Out[%d]: ' % session['command_number'],
              '\n', ])
-        session['console_output'].extend(sasn_cmd_helper.exec_cmd_test(request.form['cmd']))
+        session['console_output'].extend(sasn_cmd_helper.exec_cmd(request.form['cmd']))
         session['command_number'] += 1
         return render_template('console.html', results=session['console_output'])
     else:
         return render_template('console.html')
 
 
-@app.route('/home/')
+@admin.route('/home/')
 def home():
-    # app.logger.info("in home")
+    # admin.logger.info("in home")
     if not session.get('logged_in'):
         abort(401)
-
-    # check if connection is OK now
+    sasn_cmd_helper.set_rp_ip(settings.RP_IP_DICT[session['sasn_vm']])
+    sasn_cmd_helper.check_connection()
+    # check if connection between host and rp is OK now
     if sasn_cmd_helper.check_ssh_key_ok():
         # get latest sasn status every time
         session['sasn_status'] = sasn_cmd_helper.get_software_information()
@@ -79,16 +53,15 @@ def home():
                                error='There is something wrong with ssh key between RP and Host, please check!')
 
 
-@app.errorhandler(401)
+@admin.errorhandler(401)
 def page_need_authorization():
     return render_template('401.html'), 401
 
 
-@app.route('/', methods=['GET', 'POST'])
+@admin.route('/', methods=['GET', 'POST'])
 def login():
     error = None
     if request.method == 'GET':
-
         # clear console output everytime a user is created
         session['console_output'] = []
         session['command_number'] = 0
@@ -102,28 +75,44 @@ def login():
         return render_template('login.html', error=error)
 
     if request.method == 'POST':
-        if request.form['username'] != settings.RP_USERNAME or request.form['password'] != settings.RP_PASSWORD:
-            error = 'Invalid credential'
-            return render_template('login.html', error=error)
+        # pdb.set_trace()
+        if request.form.get('username'):
+            # this means POST comes with username and password
+            if not if_ip_valid_for_ipv4(request.form['hostip']):
+                error = 'Please enter a valid IP address'
+                return render_template('login.html', error=error)
+            if request.form['username'] != settings.HOST_USERNAME or request.form['password'] != settings.HOST_PASSWORD:
+                error = 'Invalid credential'
+                # put return here since it can return immediately without doing next
+                return render_template('login.html', error=error)
+
+            if not sasn_cmd_helper.init_ssh_to_host(request.form['hostip'], request.form['username'],
+                                                    request.form['password']):
+                error = 'Can not log in {} with this username and password!'.format(request.form['hostip'])
+                return render_template('login.html', error=error)
+            else:
+                sasn_vm_number = sasn_cmd_helper.get_sasn_vm_number()
+                return render_template('login.html', sasn_vm_number=sasn_vm_number)
         else:
-            return redirect(url_for('home'))
+            # this means POST comes with only sasn vm number
+            session['sasn_vm'] = request.form['sasn_vm']
+            return redirect(url_for('admin.home'))
 
 
-@app.route('/logout')
+@admin.route('/logout')
 def logout():
-    # app.logger.info('In log out')
+    # admin.logger.info('In log out')
     session.pop('logged_in', None)
-    return redirect(url_for('login'))
+    return redirect(url_for('admin.login'))
 
 
-@app.route('/loadandapply/', methods=['GET', 'POST'])
+@admin.route('/loadandadminly/', methods=['GET', 'POST'])
 def upload_file():
-
     def allowed_file(filename):
         return '.' in filename and \
                filename.rsplit('.', 1)[1] in settings.ALLOWED_EXTENSIONS
 
-    # app.logger.info('In load and apply')
+    # admin.logger.info('In load and adminly')
     if not session.get('logged_in'):
         abort(401)
     upload_result = None
@@ -131,16 +120,16 @@ def upload_file():
         config_file = request.files['file']
         if config_file and allowed_file(config_file.filename):
             config_file.save(settings.CONFIG_FILE_PATH)
-            upload_result = sasn_cmd_helper.load_apply(settings.CONFIG_FILE_PATH)
+            upload_result = sasn_cmd_helper.load_adminly(settings.CONFIG_FILE_PATH)
         else:
             upload_result = ['Invalid extension of file, should end with wzd, cfg or conf']
 
-    return render_template('loadandapply.html', upload_result=upload_result)
+    return render_template('loadandadminly.html', upload_result=upload_result)
 
 
-@app.route('/cdrDecoder/', methods=['GET', 'POST'])
+@admin.route('/cdrDecoder/', methods=['GET', 'POST'])
 def decode_CDR():
-    # app.logger.info('In cdr decode')
+    # admin.logger.info('In cdr decode')
     if not session.get('logged_in'):
         abort(401)
     error = None
@@ -159,25 +148,25 @@ def decode_CDR():
     return render_template('cdrDecoder.html', error=error)
 
 
-@app.route('/showstatus/')
+@admin.route('/showstatus/')
 def show_status():
-    # app.logger.info('In show status')
+    # admin.logger.info('In show status')
     # This is just the fake command for test, need update in the final version
-    # rel_showstatus = sasn_cmd_helper.exec_cmd_test('ls')
+    # rel_showstatus = sasn_cmd_helper.exec_cmd('ls')
     if not session.get('logged_in'):
         abort(401)
     rel_showstatus = sasn_cmd_helper.show_status()
     return render_template('showstatus.html', results=rel_showstatus)
 
 
-@app.route('/showsessions/', methods=['GET', 'POST'])
+@admin.route('/showsessions/', methods=['GET', 'POST'])
 def show_session():
-    # app.logger.info('In show session')
+    # admin.logger.info('In show session')
     if not session.get('logged_in'):
         abort(401)
     if request.method == 'GET':
         # This is just the fake command for test, need update in the final version
-        # session['rel_showpart'] = sasn_cmd_helper.exec_cmd_test('ls')
+        # session['rel_showpart'] = sasn_cmd_helper.exec_cmd('ls')
         # return render_template('showsessions.html', results_showpart=session['rel_showpart'])
         session['partition_amount'] = sasn_cmd_helper.get_partition_amount()
         return render_template('showsessions.html', partition_amount=session['partition_amount'])
@@ -190,14 +179,12 @@ def show_session():
         return render_template('showsessions.html', partition_amount=session['partition_amount'],
                                show_scm_sessions=show_scm_sessions)
 
-@app.route('/help/', methods=['GET'])
+
+@admin.route('/help/', methods=['GET'])
 def help():
     return render_template('help.html')
 
-@app.route('/contact/', methods=['GET'])
+
+@admin.route('/contact/', methods=['GET'])
 def contact():
     return render_template('contact.html')
-
-if __name__ == '__main__':
-
-    app.run(debug=True)

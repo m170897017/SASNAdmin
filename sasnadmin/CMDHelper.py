@@ -20,52 +20,47 @@ class SASNCMDHelper(object):
     """
 
     def __init__(self):
-        self.rp = None
-        self.test = None
+        self.host_ip = None
+        self.rp_ip = None
+        self.host = None
         self.rsa_key_trans_done = None
 
 
     def __del__(self):
-        # self.rp.close()
-        self.test.close()
+        if self.host:
+            self.host.close()
 
-    def init_ssh_to_rp(self):
+    def init_ssh_to_host(self, host_ip=settings.HOST_IP, username=settings.HOST_USERNAME, password=settings.HOST_PASSWORD):
         """
-        Creating connection towards RP card.
+        Create connection towards host.
+        :param host_ip: IP of host.
+        :return: If connection is ok return True else return False
+        """
+        try:
+            self.host = paramiko.SSHClient()
+            self.host.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            self.host.connect(host_ip, username=username, password=password)
+        except paramiko.ssh_exception.BadAuthenticationType, e:
+            # TODO: need to log e here
+            return False
+        # TODO: need to log something here
+        return True
+
+    def set_rp_ip(self, ip):
+        """
+        Set RP ip to be connected to
+        :param ip: A string like '11.13.11.10'
         :return: None
         """
-        self.rp = paramiko.SSHClient()
-        self.rp.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.rp.connect(settings.RP_IP, username=settings.RP_USERNAME, password=settings.RP_PASSWORD)
-
-
-    def init_ssh_for_test(self):
-        """
-        Creating connection towards host.
-        :return: None
-        """
-        self.test = paramiko.SSHClient()
-        self.test.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.test.connect(hostname=settings.HOST_IP, username=settings.HOST_USERNAME, password=settings.HOST_PASSWORD)
-
+        self.rp_ip = ip
 
     def exec_cmd(self, cmd):
-        """
-        Execute commands in RP card and return results.
-        :param cmd: Command to be executed.
-        :return: execution results
-        """
-        stdin, stdout, stderr = self.rp.exec_command(self.__cmd_for(cmd))
-        return stderr.readlines()
-
-    def exec_cmd_test(self, cmd):
         """
         Execute commands in Host and return results.
         :param cmd: Command to be executed.
         :return: execution results
         """
-        print 'command to execute', self.__cmd_for_test(cmd)
-        stdin, stdout, stderr = self.test.exec_command(self.__cmd_for_test(cmd))
+        stdin, stdout, stderr = self.host.exec_command(self.__cmd_for_exec(cmd))
         stdout_info = stdout.readlines()
         if stdout_info:
             return stdout_info
@@ -73,15 +68,8 @@ class SASNCMDHelper(object):
         if stderr_info:
             return stderr_info
 
-    def __cmd_for(self, cmd):
-        """
-        Format command line in order to be executed in RP card.
-        :param cmd: Command to be executed.
-        :return: None
-        """
-        return settings.RP_NSSH + ' "' + cmd + '"'
 
-    def __cmd_for_test(self, cmd):
+    def __cmd_for_exec(self, cmd):
         """
         Format command line in order to be executed in Host.
         :param cmd: Command to be executed.
@@ -91,7 +79,7 @@ class SASNCMDHelper(object):
             cmd = cmd.replace('"', '\\\'')
         elif cmd.find('\'') != -1:
             cmd = cmd.replace('\'', '\\\'')
-        return settings.TEST_NSSH % cmd
+        return settings.TEST_NSSH.format(self.rp_ip) % cmd
 
     def get_software_information(self):
         """
@@ -100,7 +88,7 @@ class SASNCMDHelper(object):
         format is soft_info[heuristics_release_for_vm0, vm0_heuristics_installed_for_vm0, sasn_vpf_release_for_vm0, ...]
         Every three elements are for one SASN VM.
         """
-        sasn_status = self.exec_cmd_test(SASNCommands.SHOW_SOFTWARE_INFO)
+        sasn_status = self.exec_cmd(SASNCommands.SHOW_SOFTWARE_INFO)
         soft_info = []
         for status_info in sasn_status:
             if 'heuristics' in status_info:
@@ -117,15 +105,25 @@ class SASNCMDHelper(object):
         Get partition amount from all appvms.
         :return: Partition amount not including partition 0
         """
-        sasn_partition_info = self.exec_cmd_test(SASNCommands.SHOW_PARTITION_CONFIG)
+        sasn_partition_info = self.exec_cmd(SASNCommands.SHOW_PARTITION_CONFIG)
         return max([re.search('\d+', i).group() for i in
                         [info for info in sasn_partition_info if 'ns partition set' in info]])
 
     def show_scm_sessions(self, partition, sasn_role):
-        return self.exec_cmd_test(SASNCommands.SHOW_SCM_SESSION.format(partition, sasn_role))
+        """
+        Show scm session info of SASN.
+        :param partition: partition number on which scm module runs
+        :param sasn_role: master or backup
+        :return: result info of show scm sessions
+        """
+        return self.exec_cmd(SASNCommands.SHOW_SCM_SESSION.format(partition, sasn_role))
 
     def show_status(self):
-        return self.exec_cmd_test(SASNCommands.SHOW_ALL_STATUS)
+        """
+        Show status of SASN VMs.
+        :return: result info of show status.
+        """
+        return self.exec_cmd(SASNCommands.SHOW_ALL_STATUS)
 
     def load_apply(self, config_file):
         """
@@ -145,8 +143,8 @@ class SASNCMDHelper(object):
         self.__upload_to_host(load_apply_script, load_apply_script_on_host)
         self.__upload_to_host(config_file, config_file_on_rp)
 
-        self.test.exec_command('chmod 744 /tmp/loadApply')
-        stdin, stdout, stderr = self.test.exec_command('/tmp/loadApply')
+        self.host.exec_command('chmod 744 /tmp/loadApply')
+        stdin, stdout, stderr = self.host.exec_command('/tmp/loadApply')
         stdout_info = stdout.readlines()
 
         self.__wait_until_commit_done()
@@ -159,39 +157,49 @@ class SASNCMDHelper(object):
 
         # app.logger.info('start trans key to RP')
         self.rsa_key_trans_done = False
-        rsa_trans_script = self.__render_template('RSAKeyTrans', ip=settings.RP1_IP)
+        rsa_trans_script = self.__render_template('RSAKeyTrans', ip=self.rp_ip)
         rsa_gen_script = self.__render_template("GenerateKeys")
 
         self.__upload_to_host(rsa_gen_script, '/tmp/GenerateKeys')
         self.__upload_to_host(rsa_trans_script, '/tmp/RSAKeyTran')
-        self.test.exec_command('chmod 744 /tmp/GenerateKeys')
-        self.test.exec_command('chmod 744 /tmp/RSAKeyTran')
-        stdin, stdout, stderr = self.test.exec_command('/tmp/GenerateKeys')
+        self.host.exec_command('chmod 744 /tmp/GenerateKeys')
+        self.host.exec_command('chmod 744 /tmp/RSAKeyTran')
+        stdin, stdout, stderr = self.host.exec_command('/tmp/GenerateKeys')
         # app.logger.info('stdout is: %s ', stdout.readlines())
         sleep(2)
-        stdin, stdout, stderr = self.test.exec_command('/tmp/RSAKeyTran')
+        stdin, stdout, stderr = self.host.exec_command('/tmp/RSAKeyTran')
         # app.logger.info('stdout is: %s ', stdout.readlines())
         self.rsa_key_trans_done = True
 
     def check_connection(self):
+        """
+        Check connection between host and rp.
+        :return: None
+        """
 
+        print 'now start to check connection'
         self.rsa_key_trans_done = False
 
         # app.logger.info('checking the connections')
-        stdin, stdout, stderr = self.test.exec_command(settings.CHECK_SSH_CMD)
+        stdin, stdout, stderr = self.host.exec_command(settings.CHECK_SSH_CMD.format(self.rp_ip))
         # app.logger.info('try to read lines')
         result = stdout.readlines()
         resulterror = stderr.readlines()
         # app.logger.info('stdout is %s', result)
         # app.logger.info('stderr is %s', resulterror)
         # wait some time to avoid unstable situation
-        time.sleep(3)
+        time.sleep(1)
         if not result:
-            print 'need to trans key!!!'
             self.rsa_key_trans()
         else:
-            print 'no need to trans key!!!!'
             self.rsa_key_trans_done = True
+
+    def get_sasn_vm_number(self):
+
+        stdin, stdout, stderr = self.host.exec_command(settings.XM_LIST)
+        xm_list_info = stdout.readlines()
+        return len([value for value in xm_list_info if value.startswith('rp_')])
+
 
     def cdrDecode(self, config_file):
         '''
@@ -203,9 +211,9 @@ class SASNCMDHelper(object):
         self.__upload_to_host(settings.PATH_ASN1DECODER, '/tmp/asn1decoder')
         self.__upload_to_host(config_file, '/tmp/cdrfile')
 
-        self.test.exec_command('chmod 744 /tmp/asn1decoder')
-        self.test.exec_command('/tmp/asn1decoder /tmp/cdrfile')
-        stdin, stdout, stderr = self.test.exec_command('cat --number /tmp/cdrfile.txt')
+        self.host.exec_command('chmod 744 /tmp/asn1decoder')
+        self.host.exec_command('/tmp/asn1decoder /tmp/cdrfile')
+        stdin, stdout, stderr = self.host.exec_command('cat --number /tmp/cdrfile.txt')
         return stdout.readlines()
 
     def check_ssh_key_ok(self):
@@ -229,7 +237,7 @@ class SASNCMDHelper(object):
         """
         retry_time = 3
         while retry_time > 0:
-            info = self.exec_cmd_test(SASNCommands.SHOW_COMMIT_PROGRESS)
+            info = self.exec_cmd(SASNCommands.SHOW_COMMIT_PROGRESS)
             if info and 'No commit in progress' in info[0]:
                 return None
             retry_time -= 1
@@ -258,22 +266,31 @@ class SASNCMDHelper(object):
         :return: None
         """
 
-        with self.test.open_sftp() as sftp_con:
+        with self.host.open_sftp() as sftp_con:
             sftp_con.put(src_file_path, dst_file_path)
 
 
+sasn_cmd_helper = SASNCMDHelper()
+
 if __name__ == '__main__':
+    my_helper = SASNCMDHelper()
+    my_helper.init_ssh_to_host()
     # ssh = paramiko.SSHClient()
     # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    # ssh.connect('10.65.100.22', username='root', password='rootroot')
+    # ssh.connect('10.65.100.22', username='root1', password='rootroot2')
+    # print 'done'
+    # ssh.close()
     # stdin, stdout, stderr = ssh.exec_command('date')
     # print stdout.readlines()
     # print stderr.readlines()
 
-    # test for ssh connection
-    my_helper = SASNCMDHelper()
-    my_helper.init_ssh_for_test()
-    print my_helper.get_partition_amount()
-    print my_helper.show_scm_sessions('1', 1)
+    # test for wrong username or password
 
-    # test for template render
+    # assert my_helper.init_ssh_to_host('10.65.100.22', username='root', password='rootroot'), 'Can not log in host with right username/password!!'
+    # assert not my_helper.init_ssh_to_host('10.65.100.22', username='root1', password='rootroot'), 'Log in host with wrong username/password'
+    # assert not my_helper.init_ssh_to_host('10.65.100.22', username='root', password='rootroot1'), 'Log in host with wrong username/password'
+    # print 'test for function init_ssh_to_host pass!!'
+
+    # test for function get_sasn_vm_number
+    # assert 0 <= my_helper.get_sasn_vm_number() <= 4, 'VM number of SASN should in [0, 4]'
+    # print 'test for function get_sasn_vm_number pass!!'

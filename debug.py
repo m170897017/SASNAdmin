@@ -1,68 +1,8 @@
-# import functools
-# def ExpHandler(*pargs):
-#     """ An exception handling idiom using decorators"""
-#
-#     def wrapper(f):
-#         if pargs:
-#             (handler,li) = pargs
-#             t = [(ex, handler)
-#                  for ex in li ]
-#             t.reverse()
-#         else:
-#             print 'enter else'
-#             t = [(Exception,None)]
-#
-#         def newfunc(t,*args, **kwargs):
-#             ex, handler = t[0]
-#
-#             try:
-#                 if len(t) == 1:
-#                     f(*args, **kwargs)
-#                 else:
-#                     newfunc(t[1:],*args,**kwargs)
-#             except ex,e:
-#                 if handler:
-#                     handler(e)
-#                 else:
-#                     print e.__class__.__name__, ':', e
-#
-#         return functools.partial(newfunc,t)
-#     return wrapper
-# def myhandler(e):
-#     print 'Caught exception!', e
-#
-# # Examples
-# # Specify exceptions in order, first one is handled first
-# # last one last.
-#
-# @ExpHandler(myhandler,(ZeroDivisionError,))
-# @ExpHandler(None,(AttributeError, ValueError))
-# def f1():
-#     1/0
-#
-# @ExpHandler()
-# def f3(*pargs):
-#     l = pargs
-#     return l.index(10)
-#
-# if __name__=="__main__":
-#     f1()
-#     f3()
+def if_ip_valid(ip):
+    ip = ip.split('.')
+    # print ip
+    print [len(number) <= 3 and 0 < int(number) < 255 for number in ip]
+    return len(ip) == 4 and all([len(number) <= 3 and 0 < int(number) < 255 for number in ip])
 
-
-
-# def fuck(fn):
-#     print "fuck %s!" % fn.__name__[::-1].upper()
-#
-# @fuck
-# def wfg():
-#     pass
-
-a = 1
-print a
-if __name__=="__main__":
-    print 'in main'
-
-
-
-
+print if_ip_valid('192.168.1.0001')
+print if_ip_valid('0.0.0.0')
