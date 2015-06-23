@@ -8,6 +8,7 @@ import re
 from time import sleep
 
 import paramiko
+from paramiko.ssh_exception import *
 from jinja2 import Environment, FileSystemLoader
 
 from sasnadmin import settings
@@ -40,7 +41,7 @@ class SASNCMDHelper(object):
             self.host = paramiko.SSHClient()
             self.host.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             self.host.connect(host_ip, username=username, password=password)
-        except paramiko.ssh_exception.BadAuthenticationType, e:
+        except (BadAuthenticationType, AuthenticationException) as e:
             # TODO: need to log e here
             return False
         # TODO: need to log something here
@@ -56,17 +57,18 @@ class SASNCMDHelper(object):
 
     def exec_cmd(self, cmd):
         """
-        Execute commands in Host and return results.
+        Execute commands in Host and return results. Try 3 times to avoid return none.
         :param cmd: Command to be executed.
         :return: execution results
         """
-        stdin, stdout, stderr = self.host.exec_command(self.__cmd_for_exec(cmd))
-        stdout_info = stdout.readlines()
-        if stdout_info:
-            return stdout_info
-        stderr_info = stderr.readlines()
-        if stderr_info:
-            return stderr_info
+        for i in xrange(3):
+            stdin, stdout, stderr = self.host.exec_command(self.__cmd_for_exec(cmd))
+            stdout_info = stdout.readlines()
+            if stdout_info:
+                return stdout_info
+            stderr_info = stderr.readlines()
+            if stderr_info:
+                return stderr_info
 
 
     def __cmd_for_exec(self, cmd):
@@ -98,6 +100,7 @@ class SASNCMDHelper(object):
             if 'sasn-vpf' in status_info:
                 info = status_info.split()
                 soft_info.append(info[2])
+
         return soft_info
 
     def get_partition_amount(self):
@@ -136,7 +139,7 @@ class SASNCMDHelper(object):
         load_apply_script_on_host = '/tmp/loadApply'
         config_file_on_host = config_file_on_rp = '/tmp/config.com'
         load_apply_script = self.__render_template('loadApply', config_file_on_host=config_file_on_host,
-                                                   ip=settings.RP1_IP,
+                                                   ip=self.rp_ip,
                                                    config_file_on_rp=config_file_on_rp)
 
         # put config file onto server using sftp
@@ -177,7 +180,6 @@ class SASNCMDHelper(object):
         :return: None
         """
 
-        print 'now start to check connection'
         self.rsa_key_trans_done = False
 
         # app.logger.info('checking the connections')

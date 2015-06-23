@@ -38,12 +38,14 @@ def home():
     # admin.logger.info("in home")
     if not session.get('logged_in'):
         abort(401)
-    sasn_cmd_helper.set_rp_ip(settings.RP_IP_DICT[session['sasn_vm']])
-    sasn_cmd_helper.check_connection()
     # check if connection between host and rp is OK now
     if sasn_cmd_helper.check_ssh_key_ok():
         # get latest sasn status every time
         session['sasn_status'] = sasn_cmd_helper.get_software_information()
+        if not session['sasn_status']:
+            return render_template('status.html',
+                                   error='Please make sure you have SASN correctly installed in this user!\n'
+                                         'Use console output to identify this please.')
         # since we only get three kinds of info for sasn vms, we divide it by 3 in html file
         session['sasn_info_num'] = len(session['sasn_status'])
         return render_template('status.html', sasn_software_info=session['sasn_status'],
@@ -96,6 +98,8 @@ def login():
         else:
             # this means POST comes with only sasn vm number
             session['sasn_vm'] = request.form['sasn_vm']
+            sasn_cmd_helper.set_rp_ip(settings.RP_IP_DICT[session['sasn_vm']])
+            sasn_cmd_helper.check_connection()
             return redirect(url_for('admin.home'))
 
 
@@ -106,13 +110,13 @@ def logout():
     return redirect(url_for('admin.login'))
 
 
-@admin.route('/loadandadminly/', methods=['GET', 'POST'])
+@admin.route('/loadandapply/', methods=['GET', 'POST'])
 def upload_file():
     def allowed_file(filename):
         return '.' in filename and \
                filename.rsplit('.', 1)[1] in settings.ALLOWED_EXTENSIONS
 
-    # admin.logger.info('In load and adminly')
+    # admin.logger.info('In load and apply')
     if not session.get('logged_in'):
         abort(401)
     upload_result = None
@@ -120,11 +124,11 @@ def upload_file():
         config_file = request.files['file']
         if config_file and allowed_file(config_file.filename):
             config_file.save(settings.CONFIG_FILE_PATH)
-            upload_result = sasn_cmd_helper.load_adminly(settings.CONFIG_FILE_PATH)
+            upload_result = sasn_cmd_helper.load_apply(settings.CONFIG_FILE_PATH)
         else:
             upload_result = ['Invalid extension of file, should end with wzd, cfg or conf']
 
-    return render_template('loadandadminly.html', upload_result=upload_result)
+    return render_template('loadandapply.html', upload_result=upload_result)
 
 
 @admin.route('/cdrDecoder/', methods=['GET', 'POST'])

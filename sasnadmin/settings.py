@@ -25,8 +25,8 @@ HOST_PASSWORD = 'rootroot'
 
 RP_NSSH = '/opt/disk/service-pools/sasnpool/active/bin/nssh -c'
 # ssh from host to rp to execute commands
-TEST_NSSH = ''.join(['ssh root@', '{}', ' /opt/disk/service-pools/sasnpool/active/bin/nssh -c \\\"%s\\\"'])
-CHECK_SSH_CMD = 'ssh root@{} ls'
+TEST_NSSH = ''.join(['ssh root@', '{0}', ' /opt/disk/service-pools/sasnpool/active/bin/nssh -c \\\"%s\\\"'])
+CHECK_SSH_CMD = 'ssh root@{0} ls'
 XM_LIST = 'xm list'
 SASN_ROLE = {'master': '1', 'backup': '0'}
 

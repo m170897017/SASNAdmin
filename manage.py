@@ -10,5 +10,5 @@ __author__ = 'eccglln'
 # parser.add_option('-i', '--ip', help='connect to host IP, like 10.65.100.22', metavar='IP', action='store', dest='ip')
 # (options, args) = parser.parse_args()
 
-
+# use host parameter to run server
 create_app().run(debug=True)
